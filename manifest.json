@@ -6,11 +6,13 @@
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#d4af37",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/10543/10543350.png",
+      "src": "icon.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
