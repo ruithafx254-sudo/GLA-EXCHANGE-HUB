@@ -1,0 +1,16 @@
+{
+  "name": "DLA Global Settlement",
+  "short_name": "DLA Exchange",
+  "description": "Dubai Liquidation Authority Global Settlement Portal",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/10543/10543350.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
