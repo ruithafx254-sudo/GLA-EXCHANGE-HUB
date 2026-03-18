@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DLA | Global Settlement</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+      }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -12,6 +20,10 @@
         :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; }
         body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
+        /* INSTALL BUTTON STYLE */
+        #pwaInstall { display: none; width: 100%; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); color: var(--gold); padding: 14px; border-radius: 12px; margin-bottom: 20px; font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
         @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
@@ -23,7 +35,6 @@
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
         input, select { width: 100%; padding: 14px; background: #16191e; border: 1px solid #333; color: #fff; border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
         
-        /* EXPANDED GRID */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid #222; border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
         .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
@@ -77,6 +88,8 @@
 
     <div class="panel">
         <div id="form">
+            <button id="pwaInstall">✨ Install DLA Mobile App</button>
+
             <h2>Exchange</h2>
             <div class="tag">Dubai Liquidation Authority</div>
 
@@ -189,6 +202,25 @@
         emailjs.init("66-CK4LaUN-dxuYbi");
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        // PWA INSTALL SCRIPT
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwaInstall').style.display = 'block';
+        });
+
+        document.getElementById('pwaInstall').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('pwaInstall').style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
 
         const wmLayer = document.getElementById('wm-layer');
         for(let i=0; i<30; i++) {
