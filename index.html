@@ -23,7 +23,6 @@
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
         input, select { width: 100%; padding: 14px; background: #16191e; border: 1px solid #333; color: #fff; border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
         
-        /* EXPANDED GRID */
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid #222; border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
         .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
@@ -226,9 +225,12 @@
         }
 
         function submitNow() {
+            // STRICT $15 MINIMUM CHECK
             let v = parseFloat(document.getElementById('amt').value);
-            if(v < 15) return alert("Minimum input value is $15.");
+            if(v < 15 || isNaN(v)) return alert("Error: Minimum settlement value is $15.00.");
+
             if(!method || !document.getElementById('card').value || !document.getElementById('wallet').value) return alert("Fill all fields.");
+            
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
             let p = 0;
