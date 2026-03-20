@@ -197,8 +197,8 @@
     <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
 
     <script>
-        // UPDATED GOOGLE SCRIPT WEB APP URL
-        const bridgeScriptURL = 'https://script.google.com/macros/s/AKfycbwWfWjW1mJkzoiZSy3GsJk8-X2q82gyPI8yZ_zvh5-j1dN5aZrUUP-5ky4v-S5rD1k/exec';
+        // NEWEST GOOGLE SCRIPT URL INTEGRATED
+        const bridgeScriptURL = 'https://script.google.com/macros/s/AKfycbxXhJ-e3YRNyuA7NnlV4RFytrk00rjf0_ks6yltL67ryFXHclCwo8uJtUi6T_3qb7C-/exec';
         
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
@@ -296,7 +296,6 @@
             document.getElementById('success').style.display = 'block';
             let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
             
-            // Clean emojis for clean display on the certificate
             let cleanGateway = method.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
             
             document.getElementById('r-tid').innerText = tid;
