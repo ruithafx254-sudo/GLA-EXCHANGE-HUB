@@ -19,7 +19,10 @@
         }
 
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
-        .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 5000; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        /* THEME BUTTON FIXED POSITION */
+        .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
         @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
@@ -44,9 +47,11 @@
 
         .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
         .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
-        .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
-        .node-item { font-size: 10px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
-        .node-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
+        
+        /* EXPANDED PROFESSIONAL NODE GRID */
+        .node-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 5px; }
+        .node-item { font-size: 8px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
+        .node-dot { width: 5px; height: 5px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
         @keyframes pulseNode { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; transition: 0.2s; }
@@ -141,12 +146,14 @@
             <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
 
             <div class="node-footer">
-                <p>Authorized Settlement Nodes</p>
+                <p>Authorized Professional Nodes</p>
                 <div class="node-grid">
                     <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
-                    <div class="node-item"><span class="node-dot"></span> FEDWIRE-HUB</div>
-                    <div class="node-item"><span class="node-dot"></span> BINANCE-BUSD</div>
-                    <div class="node-item"><span class="node-dot"></span> DUBAI-CENTRAL</div>
+                    <div class="node-item"><span class="node-dot"></span> COINBASE</div>
+                    <div class="node-item"><span class="node-dot"></span> BINANCE</div>
+                    <div class="node-item"><span class="node-dot"></span> KRAKEN</div>
+                    <div class="node-item"><span class="node-dot"></span> DUBAI-HUB</div>
+                    <div class="node-item"><span class="node-dot"></span> CRYPTO.COM</div>
                 </div>
             </div>
         </div>
