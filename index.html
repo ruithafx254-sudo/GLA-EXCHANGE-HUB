@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DLA | Global Settlement Hub</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
         
+        /* 1. FEATURE: LIVE TICKER */
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
         @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
@@ -22,8 +23,9 @@
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
         input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
         
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; }
-        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        /* 2. FEATURE: EXTENDED PAYOUT GRID */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
+        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
 
         .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
@@ -31,33 +33,40 @@
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; }
 
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; }
+        .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
 
-        .receipt-container { background: #000; color: #fff; padding: 25px; border: 1px solid var(--gold); border-radius: 16px; width: 100%; box-sizing: border-box; text-align: center; }
-        .dla-seal-receipt { color: var(--gold); border: 1px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; margin-bottom: 15px; }
-        .cert-title { font-size: 20px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; }
-        .code-box { border: 1px solid var(--gold); padding: 10px; border-radius: 8px; font-size: 12px; color: var(--gold); margin-bottom: 15px; text-transform: uppercase; }
-        .data-panel { background: #111; border-radius: 12px; padding: 15px; text-align: left; margin-bottom: 15px; }
+        /* 3. FEATURE: DARK CERTIFICATE */
+        .receipt-container { background: #000; color: #fff; padding: 25px; border: 1px solid var(--gold); border-radius: 16px; width: 100%; box-sizing: border-box; text-align: center; position: relative; overflow: hidden; }
+        .watermark-overlay { position: absolute; top: 0; left: 0; width: 150%; height: 150%; pointer-events: none; opacity: 0.05; z-index: 1; display: flex; flex-wrap: wrap; transform: rotate(-25deg); }
+        .wm-text { font-size: 8px; margin: 10px; color: #fff; text-transform: uppercase; font-weight: 900; }
+        .receipt-body { position: relative; z-index: 2; }
+        .dla-seal-receipt { color: var(--gold); border: 1px solid var(--gold); border-radius: 50%; width: 50px; height: 50px; display: inline-flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; margin-bottom: 10px; }
+        .cert-title { font-size: 20px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; }
+        .code-box { border: 1px solid var(--gold); padding: 8px; border-radius: 8px; font-size: 11px; color: var(--gold); margin-bottom: 15px; text-transform: uppercase; }
+        .data-panel { background: #111; border-radius: 12px; padding: 15px; text-align: left; margin-bottom: 15px; border: 1px solid #222; }
         .r-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 11px; }
         .r-label { color: #888; text-transform: uppercase; }
         .r-value { color: #fff; font-family: monospace; }
         .redemption-zone { border: 1px dashed #4ade80; background: rgba(74,222,128,0.05); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
         .red-label { color: #4ade80; font-size: 10px; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 5px; }
-        .red-code { font-size: 18px; font-weight: 900; letter-spacing: 2px; color: #fff; word-break: break-all; }
+        .red-code { font-size: 18px; font-weight: 900; letter-spacing: 1px; color: #fff; word-break: break-all; }
         .final-val { font-size: 42px; font-weight: 900; color: #fff; margin: 10px 0; }
+        .timer-banner { background: var(--gold); color: #000; padding: 8px; font-weight: 900; font-size: 12px; border-radius: 4px; margin-bottom: 15px; }
 
+        /* 4. FEATURE: NODES & FOOTER */
         .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
         .node-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .node-item { font-size: 10px; color: #999; display: flex; align-items: center; gap: 8px; }
+        .node-item { font-size: 9px; color: #666; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
         .node-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; }
 
         #loader { display: none; text-align: center; padding: 30px 0; }
-        #pbar_container { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; }
+        #pbar_container { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 15px; }
         #pbar { width: 0%; height: 100%; background: var(--gold); transition: width 0.3s; }
         #success { display: none; width: 100%; }
 
-        /* WhatsApp Support Button Restored */
-        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .chat-dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
+        /* 5. FEATURE: WHATSAPP BUTTON */
+        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-size: 13px; font-weight: bold; }
+        .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -65,7 +74,7 @@
 
     <audio id="cashSound" src="https://www.myinstants.com/media/sounds/cash-register-purchase.mp3" preload="auto"></audio>
 
-    <div class="ticker-wrap"><div class="ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
+    <div class="ticker-wrap"><div class="ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE • 🏛️ CENTRAL HUB VERIFIED</div></div>
 
     <div class="panel">
         <div id="form">
@@ -78,6 +87,7 @@
                 <option value="1.4">📦 Amazon Global [1.4x]</option>
                 <option value="1.4">🍎 Apple iTunes [1.4x]</option>
                 <option value="1.4">💎 Razer Gold [1.4x]</option>
+                <option value="1.4">🎮 Steam Wallet [1.4x]</option>
             </select>
 
             <label>Card Secret Code</label>
@@ -94,10 +104,12 @@
 
             <label>Global Payout Gateway</label>
             <div class="grid">
-                <div class="pay" onclick="sel(this, 'USDT', 'Enter Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
-                <div class="pay" onclick="sel(this, 'PayPal', 'Enter Email', 1, 'USD')"><span>🔵</span>PayPal</div>
-                <div class="pay" onclick="sel(this, 'Bank NG', 'Acct No', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
+                <div class="pay" onclick="sel(this, 'USDT', 'Enter TRC20 Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
+                <div class="pay" onclick="sel(this, 'PayPal', 'Enter Email Address', 1, 'USD')"><span>🔵</span>PayPal</div>
+                <div class="pay" onclick="sel(this, 'Bank NG', 'Acct No + Bank', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
                 <div class="pay" onclick="sel(this, 'MoMo GH', 'Phone Number', 14.80, 'GHS')"><span>🇬🇭</span>MoMo GH</div>
+                <div class="pay" onclick="sel(this, 'CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span>CashApp</div>
+                <div class="pay" onclick="sel(this, 'Zelle', 'Enter Email/Phone', 1, 'USD')"><span>🌀</span>Zelle</div>
             </div>
 
             <label id="payout-label">Payout Details</label>
@@ -107,49 +119,66 @@
             <input id="email" type="email" placeholder="Required for receipt">
 
             <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
+            <div class="secure-badge">🛡️ SSL 256-BIT ENCRYPTION SECURE</div>
 
             <div class="node-footer">
                 <div class="node-grid">
-                    <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
+                    <div class="node-item"><span class="node-dot"></span> SWIFT-HUB</div>
                     <div class="node-item"><span class="node-dot"></span> DUBAI-CENTRAL</div>
                 </div>
             </div>
         </div>
 
         <div id="loader">
-            <p style="color:var(--gold); font-weight:bold;">SYSTEM VERIFICATION...</p>
+            <p style="color:var(--gold); font-weight:900; font-size:14px; letter-spacing:1px;">SYSTEM VERIFICATION...</p>
             <div id="pbar_container"><div id="pbar"></div></div>
+            <div id="v-steps" style="font-size:10px; color:#555; margin-top:15px; text-align:left; line-height:2;">
+                <div id="s1">○ Syncing with Global Liquidity Pool...</div>
+                <div id="s2">○ Authenticating Asset Credentials...</div>
+            </div>
         </div>
 
         <div id="success">
             <div class="receipt-container" id="receipt-content">
-                <div class="dla-seal-receipt">DLA<br>SEAL</div>
-                <div class="cert-title">Certificate of<br>Settlement</div>
-                <div class="code-box">Code Pending Verification</div>
-                
-                <div class="data-panel">
-                    <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
-                    <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
-                    <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
-                </div>
+                <div class="watermark-overlay" id="wm-layer"></div>
+                <div class="receipt-body">
+                    <div class="dla-seal-receipt">DLA<br>SEAL</div>
+                    <div class="cert-title">Certificate of<br>Settlement</div>
+                    <div class="code-box">Code Pending Verification</div>
+                    
+                    <div class="data-panel">
+                        <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
+                        <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
+                        <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
+                    </div>
 
-                <div class="redemption-zone">
-                    <span class="red-label">Redemption Code</span>
-                    <div class="red-code" id="r-card"></div>
-                </div>
+                    <div class="redemption-zone">
+                        <span class="red-label">Redemption Code</span>
+                        <div class="red-code" id="r-card"></div>
+                    </div>
 
-                <div class="final-val" id="r-price"></div>
-                <div style="font-size:10px; color:#555;">Authorized digital settlement issued by DLA Central Hub.</div>
+                    <div class="final-val" id="r-price"></div>
+                    
+                    <div class="timer-banner">EST. ARRIVAL: <span id="r-timer">01:00:00</span></div>
+
+                    <div id="qrcode" style="background:#fff; padding:5px; display:inline-block; border-radius:4px; margin-bottom:10px;"></div>
+                    <div style="font-size:9px; color:#666; font-weight:bold; text-transform:uppercase;">Authorized by DLA Central Hub</div>
+                </div>
             </div>
-            <button class="main-btn" onclick="saveHDReceipt()" style="background:#111; color:#fff; border:1px solid #333;">📄 Save Certificate</button>
+            <button class="main-btn" onclick="saveHDReceipt()" style="background:#111; color:#fff; border:1px solid #333;">📄 Save HD Certificate</button>
+            <button class="main-btn" onclick="location.reload()" style="background:var(--gold); color:#000; margin-top:10px; font-size:12px;">New Transaction</button>
         </div>
     </div>
 
-    <a href="https://wa.me/447400436904" class="chat-btn"><div class="chat-dot"></div><span>WhatsApp Support</span></a>
+    <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycby_fEsOYsc-AJbTQNcWWxcKFaFbmBVCG3d04le2_nlWkWXdM7Ur75rpCR1NSPqdJ8nO/exec';
         let method = ""; let rateL = 1; let sym = "USD";
+
+        // WATERMARK GENERATOR
+        const wmLayer = document.getElementById('wm-layer');
+        for(let i=0; i<40; i++) { wmLayer.innerHTML += '<span class="wm-text">DLA OFFICIAL</span>'; }
 
         function sel(el, val, shadow, r, s) {
             document.querySelectorAll('.pay').forEach(x => x.classList.remove('active'));
@@ -177,7 +206,7 @@
             const walletDetails = document.getElementById('wallet').value;
             const userEmail = document.getElementById('email').value;
             const amount = document.getElementById('display-area').innerText;
-            if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
+            if(!method || !cardCode || !walletDetails || !userEmail) return alert("All fields required.");
 
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
@@ -191,30 +220,44 @@
                 let p = 0;
                 let iv = setInterval(() => {
                     p++; document.getElementById('pbar').style.width = p + "%";
+                    if(p==50) document.getElementById('s1').style.color='#4ade80';
                     if(p>=100) { 
                         clearInterval(iv); 
                         showReceipt(cardCode, amount); 
-                        // PLAY CASH SOUND
                         document.getElementById('cashSound').play();
                     }
-                }, 30);
+                }, 40);
             });
         }
 
         function showReceipt(card, price) {
             document.getElementById('loader').style.display = 'none';
             document.getElementById('success').style.display = 'block';
-            document.getElementById('r-tid').innerText = "DLA-TX" + price;
+            let tid = "DLA-TX" + Math.floor(Math.random() * 900000);
+            document.getElementById('r-tid').innerText = tid;
             document.getElementById('r-gateway').innerText = method;
             document.getElementById('r-path').innerText = document.getElementById('wallet').value;
             document.getElementById('r-card').innerText = card;
             document.getElementById('r-price').innerText = price;
+            
+            // Generate QR
+            new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
+            startTimer();
+        }
+
+        function startTimer() {
+            let time = 3600;
+            setInterval(() => {
+                time--;
+                let h = Math.floor(time / 3600), m = Math.floor((time % 3600) / 60), s = time % 60;
+                document.getElementById('r-timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            }, 1000);
         }
 
         function saveHDReceipt() {
             html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'DLA_Settlement.png';
+                link.download = 'DLA_OFFICIAL_RECEIPT.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
