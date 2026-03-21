@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -65,7 +65,7 @@
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙 DARK</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
@@ -294,7 +294,6 @@
         }
 
         function showReceipt() {
-            // PLAY SUCCESS SOUND ONLY WHEN RECEIPT IS SHOWN
             successSound.play();
             
             document.getElementById('loader').style.display = 'none';
