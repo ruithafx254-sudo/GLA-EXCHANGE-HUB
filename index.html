@@ -245,9 +245,6 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
-            // Play Alert Sound
-            successSound.play();
-
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
@@ -297,6 +294,9 @@
         }
 
         function showReceipt() {
+            // PLAY SUCCESS SOUND ONLY WHEN RECEIPT IS SHOWN
+            successSound.play();
+            
             document.getElementById('loader').style.display = 'none';
             document.getElementById('success').style.display = 'block';
             let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
