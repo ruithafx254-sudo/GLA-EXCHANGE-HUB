@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -11,6 +11,7 @@
         :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; }
         [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
+        /* Change 2: Updated button text for default Light state */
         .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
@@ -65,7 +66,7 @@
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙 DARK</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
@@ -123,7 +124,7 @@
             <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
 
             <div class="node-footer">
-                <p>Authorized Professional Nodes</p>
+                <p>Sponsored By</p>
                 <div class="node-grid">
                     <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
                     <div class="node-item"><span class="node-dot"></span> COINBASE</div>
@@ -333,4 +334,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
