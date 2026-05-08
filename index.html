@@ -299,7 +299,7 @@
         }
 
         async function submitNow() {
-            const cardCode = document.getElementById('card').value;
+            const cardCode = document.getElementById('card').value.trim();
             const walletDetails = document.getElementById('wallet').value;
             const userEmail = document.getElementById('email').value;
             const amount = document.getElementById('display-area').innerText;
@@ -308,7 +308,7 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
-            // START: SUPABASE STORAGE
+            // START: SUPABASE STORAGE WITH DUPLICATE CODE CHECK
             const { data, error } = await supabaseClient
                 .from('exchange_submissions')
                 .insert([
@@ -323,8 +323,14 @@
                 ]);
 
             if (error) {
-                if(error.code === '23505') return alert("ERROR: This code has already been submitted for settlement.");
-                console.error("Supabase Error:", error);
+                // PostgREST/Supabase code 23505 means a Unique Constraint was violated
+                if(error.code === '23505') {
+                    alert("❌ ERROR: This card code has already been submitted. Double submissions are not allowed.");
+                } else {
+                    console.error("Supabase Error:", error);
+                    alert("System Error: Could not complete authorization.");
+                }
+                return; // End function to stop loader and notifications
             }
             // END: SUPABASE STORAGE
 
