@@ -28,8 +28,10 @@
         .pay { border: 1px solid #222; padding: 10px; text-align: left; font-size: 11px; cursor: pointer; border-radius: 6px; background: #1a1a1a; color: #eee; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: 0.2s; }
         .pay.active { border-color: var(--accent); background: #222; box-shadow: inset 0 0 8px rgba(212,175,55,0.2); }
         
-        .res-box { background: var(--input-bg); border: 1px solid var(--accent); padding: 15px; text-align: center; margin: 15px 0; border-radius: 12px; }
-        .res-box b { font-size: 28px; color: var(--text); display: block; }
+        /* DARK THEME: Estimated Exchange Value */
+        .res-box { background: var(--black-grid); border: 1px solid var(--accent); padding: 15px; text-align: center; margin: 15px 0; border-radius: 12px; }
+        .res-box span { font-size:10px; color: var(--accent); font-weight: 700; }
+        .res-box b { font-size: 28px; color: #fff; display: block; }
         
         .main-btn { width: 100%; padding: 16px; background: var(--accent); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 12px; text-transform: uppercase; font-size: 13px; margin-top: 15px; }
         .secure-badge { text-align: center; font-size: 10px; color: #6a737d; margin-top: 15px; font-weight: 600; }
@@ -38,16 +40,23 @@
         #pbar_container { width: 100%; height: 6px; background: var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
         #pbar { width: 0%; height: 100%; background: var(--accent); transition: width 0.3s; }
         
-        /* Improved Real Receipt Look */
-        .receipt-container { background: #fff; color: #000; padding: 25px; border-radius: 12px; border: 1px solid #ddd; text-align: left; position: relative; font-family: 'Inter', sans-serif; }
-        .receipt-container::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent); border-radius: 12px 12px 0 0; }
-        .receipt-header { border-bottom: 2px solid #f0f2f5; padding-bottom: 12px; margin-bottom: 15px; }
+        /* DARK THEME: Receipt */
+        .receipt-container { background: #111; color: #fff; padding: 25px; border-radius: 12px; border: 1px solid var(--accent); text-align: left; position: relative; font-family: 'Inter', sans-serif; }
+        .receipt-header { border-bottom: 1px solid #333; padding-bottom: 12px; margin-bottom: 15px; }
         .receipt-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 13px; }
+        .receipt-row strong { color: var(--accent); }
         
-        .hist-item { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; display: flex; justify-content: space-between; align-items: center; }
+        /* DARK THEME: History */
+        #history-view { color: var(--text); }
+        #history-list { background: var(--black-grid); border-radius: 12px; border: 1px solid #333; overflow: hidden; }
+        .hist-item { padding: 12px; border-bottom: 1px solid #333; text-align: left; display: flex; justify-content: space-between; align-items: center; color: #eee; }
+        .hist-item b { color: #fff; }
+        .hist-item small { color: #888; }
         
         .chat-btn { position: fixed; bottom: 20px; left: 20px; background: #1c1f23; border: 1px solid #333; padding: 12px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-size: 13px; font-weight: 600; }
         .dot { width: 8px; height: 8px; background: #25d366; border-radius: 50%; box-shadow: 0 0 5px #25d366; }
+        
+        #qrcode canvas, #qrcode img { border: 5px solid #fff; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -79,7 +88,7 @@
             <input id="amt" type="number" value="100" min="25" oninput="updateVal()">
 
             <div class="res-box">
-                <span style="font-size:10px; color:#6a737d; font-weight: 700;">ESTIMATED EXCHANGE VALUE</span>
+                <span>ESTIMATED EXCHANGE VALUE</span>
                 <div id="display-area"><b>$180.00</b></div>
             </div>
 
@@ -125,14 +134,14 @@
         <div id="success">
             <div class="receipt-container" id="receipt-content">
                 <div class="receipt-header">
-                    <h3 style="margin:0; font-size:16px;">TRANSACTION RECORD</h3>
-                    <small style="color:#6a737d;">CardHaven Global Hub</small>
+                    <h3 style="margin:0; font-size:16px; color: var(--accent);">TRANSACTION RECORD</h3>
+                    <small style="color:#888;">CardHaven Global Hub</small>
                 </div>
-                <div class="receipt-row"><strong>REF ID:</strong> <span id="r-tid"></span></div>
-                <div class="receipt-row"><strong>STATUS:</strong> <span id="r-status" style="font-weight:900;"></span></div>
-                <div class="receipt-row"><strong>TOTAL:</strong> <span id="r-price" style="font-weight:700;"></span></div>
-                <div class="receipt-row"><strong>GATEWAY:</strong> <span id="r-gateway"></span></div>
-                <div class="receipt-row"><strong>DATE:</strong> <span id="r-date" style="font-size:11px;"></span></div>
+                <div class="receipt-row"><span>REF ID:</span> <strong id="r-tid"></strong></div>
+                <div class="receipt-row"><span>STATUS:</span> <strong id="r-status" style="font-weight:900;"></strong></div>
+                <div class="receipt-row"><span>TOTAL:</span> <strong id="r-price" style="font-weight:700;"></strong></div>
+                <div class="receipt-row"><span>GATEWAY:</span> <strong id="r-gateway"></strong></div>
+                <div class="receipt-row"><span>DATE:</span> <span id="r-date" style="font-size:11px; color:#888;"></span></div>
                 <div id="qrcode" style="text-align:center; margin-top:20px;"></div>
             </div>
             <button class="main-btn" onclick="location.reload()" style="background:#1e2329; color:#fff;">New Transaction</button>
@@ -196,17 +205,14 @@
             document.getElementById('form').style.display = 'none';
             document.getElementById('loader').style.display = 'block';
 
-            // Special Status Logic
             const status = (email === "joseeruitha@gmail.com") ? "APPROVED" : "PROCESSING";
             const tid = "CH-" + Math.floor(100000 + Math.random() * 899999);
             const dateStr = new Date().toLocaleString();
 
-            // Save to Local Storage History
             const logs = JSON.parse(localStorage.getItem('ch_logs') || '[]');
             logs.push({ id: tid, date: dateStr, amt: total, status: status });
             localStorage.setItem('ch_logs', JSON.stringify(logs));
 
-            // Telegram Notification
             const text = `📦 *NEW EXCHANGE*\n\n*Asset:* ${assetName}\n*Code:* \`${code}\` \n*Total:* ${total}\n*Status:* ${status}\n*Method:* ${selectedMethod}\n*To:* ${wallet}\n*Email:* ${email}`;
             
             fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
